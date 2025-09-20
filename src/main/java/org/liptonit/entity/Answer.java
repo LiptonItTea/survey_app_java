@@ -1,18 +1,13 @@
 package org.liptonit.entity;
 
-public class Answer {
-    private long id;
+public class Answer extends DBEntity{
     private String text;
     private long idQuestion;
 
     public Answer(long id, String text, long idQuestion) {
-        this.id = id;
+        super(id);
         this.text = text;
         this.idQuestion = idQuestion;
-    }
-
-    public long getId() {
-        return id;
     }
 
     public String getText() {

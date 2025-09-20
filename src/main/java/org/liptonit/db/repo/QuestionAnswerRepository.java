@@ -1,4 +1,4 @@
-package org.liptonit.repo;
+package org.liptonit.db.repo;
 
 import org.liptonit.entity.QuestionAnswer;
 
