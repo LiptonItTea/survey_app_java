@@ -8,6 +8,11 @@ public class CompletedSurvey extends DBEntity{
         this.idUser = idUser;
     }
 
+    public CompletedSurvey(CompletedSurvey entity) {
+        super(entity);
+        this.idUser = entity.getIdUser();
+    }
+
     public long getIdUser() {
         return idUser;
     }

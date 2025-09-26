@@ -5,5 +5,9 @@ public class DBEntity {
 
     public DBEntity(long id) {this.id = id;}
 
+    public DBEntity(DBEntity entity) {
+        this.id = entity.getId();
+    }
+
     public long getId() {return id;}
 }

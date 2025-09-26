@@ -2,6 +2,7 @@ package org.liptonit.db;
 
 import org.liptonit.db.repo.SurveyRepository;
 import org.liptonit.db.repo.UserRepository;
+import org.liptonit.entity.DBEntity;
 import org.liptonit.entity.Survey;
 import org.liptonit.entity.User;
 import org.liptonit.util.SearchCondition;
@@ -11,32 +12,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class InMemoryDatabase{
-    private Map<Class<?>, Map<Long, Object>> repo;
+    private Map<Class<? extends DBEntity>, Map<Long, DBEntity>> repo;
 
     public InMemoryDatabase() {
         repo = new HashMap<>();
     }
 
-    public Map<Long, Object> getEntityMap(Class<?> entityClass) {
+    public Map<Long, DBEntity> getEntityMap(Class<? extends DBEntity> entityClass) {
         return repo.computeIfAbsent(entityClass, clz -> new HashMap<>());
     }
 
-    public <T> boolean createEntity(Class<?> entityClass, T entity) {
-        Map<Long, Object> entityRepo = getEntityMap(entityClass);
+    public <T extends DBEntity> boolean createEntity(Class<T> entityClass, T entity) {
+        Map<Long, DBEntity> entityRepo = getEntityMap(entityClass);
 
-        User u = new User(
-                entity.getId(),
-                entity.getNickname(),
-                entity.getEmail(),
-                entity.getRegistrationDate(),
-                entity.getHashedPassword()
-        );
-        userRepo.put(entity.getId(), u);
+        if (entityRepo.containsKey(entity.getId()))
+            return false;
+
+        entityRepo.put(entity.getId(), entity);
         return true;
     }
 
-    public User readEntityById(long id) {
-        return userRepo.getOrDefault(id, null);
+    public <T extends DBEntity> User readEntityById(Class<? extends DBEntity> entityClass, long id) {
+        return getEntityMap(entityClass).getOrDefault(id, null);
     }
 
     public Iterable<User> readEntities(SearchCondition<User> condition) {
