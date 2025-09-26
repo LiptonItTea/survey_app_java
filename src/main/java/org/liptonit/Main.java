@@ -3,7 +3,6 @@ package org.liptonit;
 
 import org.liptonit.entity.User;
 import org.liptonit.db.InMemoryDatabase;
-import org.liptonit.db.repo.UserRepository;
 
 import java.time.LocalDate;
 

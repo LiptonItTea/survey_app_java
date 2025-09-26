@@ -1,6 +1,50 @@
 package org.liptonit.db.repo;
 
+import org.liptonit.db.Database;
 import org.liptonit.entity.CompletedSurvey;
+import org.liptonit.entity.CompletedSurvey;
+import org.liptonit.util.SearchCondition;
 
-public interface CompletedSurveyRepository extends Repository<CompletedSurvey> {
+public class CompletedSurveyRepository implements Repository<CompletedSurvey> {
+    private Database db;
+    private static CompletedSurveyRepository instance;
+
+    public CompletedSurveyRepository(Database db) {this.db = db;}
+
+    public static CompletedSurveyRepository getInstance(Database db) {
+        if (instance == null)
+            instance = new CompletedSurveyRepository(db);
+
+        return instance;
+    }
+
+    @Override
+    public boolean createEntity(CompletedSurvey entity) {
+        return db.createEntity(CompletedSurvey.class, entity);
+    }
+
+    @Override
+    public CompletedSurvey readEntityById(long id) {
+        return (CompletedSurvey) db.readEntityById(CompletedSurvey.class, id);
+    }
+
+    @Override
+    public Iterable<CompletedSurvey> readEntities(SearchCondition<CompletedSurvey> condition) {
+        return db.readEntities(CompletedSurvey.class, condition);
+    }
+
+    @Override
+    public boolean updateEntityById(long id, CompletedSurvey entity) {
+        return db.updateEntityById(CompletedSurvey.class, id, entity);
+    }
+
+    @Override
+    public boolean deleteEntityById(long id) {
+        return db.deleteEntityById(CompletedSurvey.class, id);
+    }
+
+    @Override
+    public boolean deleteEntities(SearchCondition<CompletedSurvey> condition) {
+        return db.deleteEntities(CompletedSurvey.class, condition);
+    }
 }
