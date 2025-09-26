@@ -18,7 +18,7 @@ public class InMemoryDatabase{
         repo = new HashMap<>();
     }
 
-    public Map<Long, DBEntity> getEntityMap(Class<? extends DBEntity> entityClass) {
+    public <T extends DBEntity> Map<Long, DBEntity> getEntityMap(Class<T> entityClass) {
         return repo.computeIfAbsent(entityClass, clz -> new HashMap<>());
     }
 
@@ -32,46 +32,51 @@ public class InMemoryDatabase{
         return true;
     }
 
-    public <T extends DBEntity> User readEntityById(Class<? extends DBEntity> entityClass, long id) {
+    public <T extends DBEntity> DBEntity readEntityById(Class<T> entityClass, long id) {
         return getEntityMap(entityClass).getOrDefault(id, null);
     }
 
-    public Iterable<User> readEntities(SearchCondition<User> condition) {
-        ArrayList<User> list = new ArrayList<>();
-        for (Map.Entry<Long, User> e : userRepo.entrySet())
-            if (condition.select(e.getValue()))
-                list.add(e.getValue());
+    public <T extends DBEntity> Iterable<T> readEntities(Class<T> entityClass, SearchCondition<T> condition) {
+        ArrayList<T> list = new ArrayList<>();
+
+        for (Map.Entry<Long, DBEntity> e : getEntityMap(entityClass).entrySet()) {
+            T t = (T) e.getValue(); // this is fine
+
+            if (condition.select(t))
+                list.add(t);
+        }
 
         return list;
     }
 
-    public User updateEntityById(long id, User entity) throws IllegalArgumentException{
-        if (!userRepo.containsKey(id))
+    public <T extends DBEntity> boolean updateEntityById(Class<T> entityClass, long id, T entity) throws IllegalArgumentException{
+        if (!getEntityMap(entityClass).containsKey(id))
             return false;
 
-        User u = userRepo.get(id);
-        u.setNickname(entity.getEmail());
-        u.setEmail(entity.getEmail());
-        u.setHashedPassword(entity.getHashedPassword());
-        u.setRegistrationDate(entity.getRegistrationDate());
+        getEntityMap(entityClass).remove(id);
+        getEntityMap(entityClass).put(id, entity);
 
         return true;
     }
 
-    public User deleteEntityById(long id) {
-        if (!userRepo.containsKey(id))
+    public <T extends DBEntity> boolean deleteEntityById(Class<T> entityClass, long id) {
+        if (!getEntityMap(entityClass).containsKey(id))
             return false;
 
-        userRepo.remove(id);
+        getEntityMap(entityClass).remove(id);
         return true;
     }
 
-    public User deleteEntities(SearchCondition<User> condition) {
+    public <T extends DBEntity> boolean deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
         boolean result = false;
         ArrayList<Long> ids = new ArrayList<>();
 
-        for (Map.Entry<Long, User> e : userRepo.entrySet()) {
-            if (condition.select(e.getValue())) {
+        Map<Long, DBEntity> map = getEntityMap(entityClass);
+
+        for (Map.Entry<Long, DBEntity> e : map.entrySet()) {
+            T t = (T) e.getValue(); // this is fine
+
+            if (condition.select(t)) {
                 result = true;
 
                 ids.add(e.getKey());
@@ -79,25 +84,7 @@ public class InMemoryDatabase{
         }
 
         for (Long id : ids)
-            userRepo.remove(id);
-
-        return result;
-    }
-
-    public Survey deleteEntities(SearchCondition<Survey> condition) {
-        boolean result = false;
-        ArrayList<Long> ids = new ArrayList<>();
-
-        for (Map.Entry<Long, User> e : userRepo.entrySet()) {
-            if (condition.select(e.getValue())) {
-                result = true;
-
-                ids.add(e.getKey());
-            }
-        }
-
-        for (Long id : ids)
-            userRepo.remove(id);
+            map.remove(id);
 
         return result;
     }

@@ -16,16 +16,14 @@ public class Main {
         User u5 = new User(0, "benedict kemberbetch", "sherlock@mail.ru", LocalDate.now(), "some hash");
 
         InMemoryDatabase db = new InMemoryDatabase();
-        UserRepository userRepo = db;
+        db.createEntity(User.class, u1);
+        db.createEntity(User.class, u2);
+        db.createEntity(User.class, u3);
+        db.createEntity(User.class, u4);
+        db.createEntity(User.class, u5);
 
-        userRepo.createEntity(u1);
-        userRepo.createEntity(u2);
-        userRepo.createEntity(u3);
-        userRepo.createEntity(u4);
-        userRepo.createEntity(u5);
-
-        Iterable<User> all = userRepo.readEntities(u -> true);
-        for (User u : all)
+        for (User u : db.readEntities(User.class, e -> true)) {
             System.out.println(u);
+        }
     }
 }
