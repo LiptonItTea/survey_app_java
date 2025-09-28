@@ -3,7 +3,7 @@ package org.liptonit.db.repo;
 import org.liptonit.entity.Answer;
 import org.liptonit.util.SearchCondition;
 
-public class AnswerRepository implements Repository<Answer> {
+public class AnswerRepository{
     private Database db;
     private static AnswerRepository instance;
 
@@ -16,32 +16,32 @@ public class AnswerRepository implements Repository<Answer> {
         return instance;
     }
 
-    @Override
+//    @Override
     public boolean createEntity(Answer entity) {
         return db.createEntity(Answer.class, entity);
     }
 
-    @Override
+//    @Override
     public Answer readEntityById(long id) {
         return (Answer) db.readEntityById(Answer.class, id);
     }
 
-    @Override
+//    @Override
     public Iterable<Answer> readEntities(SearchCondition<Answer> condition) {
         return db.readEntities(Answer.class, condition);
     }
 
-    @Override
+//    @Override
     public boolean updateEntityById(long id, Answer entity) {
         return db.updateEntityById(Answer.class, id, entity);
     }
 
-    @Override
+//    @Override
     public boolean deleteEntityById(long id) {
         return db.deleteEntityById(Answer.class, id);
     }
 
-    @Override
+//    @Override
     public boolean deleteEntities(SearchCondition<Answer> condition) {
         return db.deleteEntities(Answer.class, condition);
     }
