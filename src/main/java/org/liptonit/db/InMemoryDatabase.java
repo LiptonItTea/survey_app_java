@@ -1,5 +1,6 @@
 package org.liptonit.db;
 
+import org.liptonit.db.repo.Database;
 import org.liptonit.entity.DBEntity;
 import org.liptonit.util.SearchCondition;
 
@@ -7,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InMemoryDatabase implements Database{
+public class InMemoryDatabase extends Database {
     private Map<Class<? extends DBEntity>, Map<Long, DBEntity>> repo;
     private static InMemoryDatabase instance;
 
@@ -27,7 +28,7 @@ public class InMemoryDatabase implements Database{
     }
 
     @Override
-    public <T extends DBEntity> boolean createEntity(Class<T> entityClass, T entity) {
+    protected <T extends DBEntity> boolean createEntity(Class<T> entityClass, T entity) {
         Map<Long, DBEntity> entityRepo = getEntityMap(entityClass);
 
         if (entityRepo.containsKey(entity.getId()))
@@ -38,12 +39,12 @@ public class InMemoryDatabase implements Database{
     }
 
     @Override
-    public <T extends DBEntity> DBEntity readEntityById(Class<T> entityClass, long id) {
+    protected  <T extends DBEntity> DBEntity readEntityById(Class<T> entityClass, long id) {
         return getEntityMap(entityClass).getOrDefault(id, null);
     }
 
     @Override
-    public <T extends DBEntity> Iterable<T> readEntities(Class<T> entityClass, SearchCondition<T> condition) {
+    protected <T extends DBEntity> Iterable<T> readEntities(Class<T> entityClass, SearchCondition<T> condition) {
         ArrayList<T> list = new ArrayList<>();
 
         for (Map.Entry<Long, DBEntity> e : getEntityMap(entityClass).entrySet()) {
@@ -57,7 +58,7 @@ public class InMemoryDatabase implements Database{
     }
 
     @Override
-    public <T extends DBEntity> boolean updateEntityById(Class<T> entityClass, long id, T entity) throws IllegalArgumentException{
+    protected <T extends DBEntity> boolean updateEntityById(Class<T> entityClass, long id, T entity) throws IllegalArgumentException{
         if (!getEntityMap(entityClass).containsKey(id))
             return false;
 
@@ -68,7 +69,7 @@ public class InMemoryDatabase implements Database{
     }
 
     @Override
-    public <T extends DBEntity> boolean deleteEntityById(Class<T> entityClass, long id) {
+    protected <T extends DBEntity> boolean deleteEntityById(Class<T> entityClass, long id) {
         if (!getEntityMap(entityClass).containsKey(id))
             return false;
 
@@ -77,7 +78,7 @@ public class InMemoryDatabase implements Database{
     }
 
     @Override
-    public <T extends DBEntity> boolean deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
+    protected <T extends DBEntity> boolean deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
         boolean result = false;
         ArrayList<Long> ids = new ArrayList<>();
 

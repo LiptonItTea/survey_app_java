@@ -1,7 +1,5 @@
 package org.liptonit.db.repo;
 
-import org.liptonit.db.Database;
-import org.liptonit.entity.Question;
 import org.liptonit.entity.Question;
 import org.liptonit.util.SearchCondition;
 

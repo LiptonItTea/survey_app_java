@@ -1,6 +1,5 @@
 package org.liptonit.db.repo;
 
-import org.liptonit.db.Database;
 import org.liptonit.entity.User;
 import org.liptonit.util.SearchCondition;
 
