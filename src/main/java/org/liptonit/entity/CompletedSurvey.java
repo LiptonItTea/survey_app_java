@@ -8,8 +8,8 @@ public class CompletedSurvey extends DBEntity{
         this.idUser = idUser;
     }
 
-    public CompletedSurvey(CompletedSurvey entity) {
-        super(entity);
+    public CompletedSurvey(Long id, CompletedSurvey entity) {
+        super(id, entity);
         this.idUser = entity.getIdUser();
     }
 

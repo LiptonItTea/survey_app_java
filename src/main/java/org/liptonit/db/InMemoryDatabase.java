@@ -4,23 +4,18 @@ import org.liptonit.db.repo.Database;
 import org.liptonit.entity.DBEntity;
 import org.liptonit.util.SearchCondition;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class InMemoryDatabase extends Database {
     private Map<Class<? extends DBEntity>, Map<Long, DBEntity>> repo;
-    private static InMemoryDatabase instance;
+    private Map<Class<? extends DBEntity>, Long> sequences;
 
-    private InMemoryDatabase() {
+    public InMemoryDatabase() {
         repo = new HashMap<>();
-    }
-
-    public static InMemoryDatabase getInstance() {
-        if (instance == null)
-            instance = new InMemoryDatabase();
-
-        return instance;
+        sequences = new HashMap<>();
     }
 
     private <T extends DBEntity> Map<Long, DBEntity> getEntityMap(Class<T> entityClass) {
@@ -30,11 +25,17 @@ public class InMemoryDatabase extends Database {
     @Override
     protected <T extends DBEntity> boolean createEntity(Class<T> entityClass, T entity) {
         Map<Long, DBEntity> entityRepo = getEntityMap(entityClass);
+        Long id = sequences.computeIfAbsent(entityClass, clz -> 0L);
 
-        if (entityRepo.containsKey(entity.getId()))
-            return false;
+        try {
+            T e = entityClass.getConstructor(Long.class, entityClass).newInstance(id, entity);
+            entityRepo.put(id, e);
+        }
+        catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalArgumentException("Looks like your entity class is missing constructor, or your constructor is not public, or your class doesn't have constructor(Long, DBEntity). You dumbass.");
+        }
 
-        entityRepo.put(entity.getId(), entity);
+        sequences.put(entityClass, sequences.get(entityClass) + 1);
         return true;
     }
 

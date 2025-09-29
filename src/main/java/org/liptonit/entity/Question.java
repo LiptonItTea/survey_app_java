@@ -13,8 +13,8 @@ public class Question extends DBEntity{
         this.idSurvey = idSurvey;
     }
 
-    public Question(Question entity) {
-        super(entity);
+    public Question(Long id, Question entity) {
+        super(id, entity);
         this.text = entity.getText();
         this.multipleAnswers = entity.isMultipleAnswers();
         this.idSurvey = entity.getIdSurvey();

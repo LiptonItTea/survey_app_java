@@ -13,8 +13,8 @@ public class Survey extends DBEntity{
         this.idUserCreator = idUserCreator;
     }
 
-    public Survey(Survey entity) {
-        super(entity);
+    public Survey(Long id, Survey entity) {
+        super(id, entity);
         this.name = entity.getName();
         this.description = entity.getDescription();
         this.idUserCreator = entity.getIdUserCreator();

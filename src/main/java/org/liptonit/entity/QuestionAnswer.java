@@ -11,8 +11,8 @@ public class QuestionAnswer extends DBEntity{
         this.idAnswer = idAnswer;
     }
 
-    public QuestionAnswer(QuestionAnswer entity) {
-        super(entity);
+    public QuestionAnswer(Long id, QuestionAnswer entity) {
+        super(id, entity);
         this.idCompletedSurvey = entity.getIdCompletedSurvey();
         this.idAnswer = entity.getIdAnswer();
     }
