@@ -1,7 +1,6 @@
 package org.liptonit.entity;
 
 public class Survey extends DBEntity{
-    private long id;
     private String name;
     private String description;
     private long idUserCreator;

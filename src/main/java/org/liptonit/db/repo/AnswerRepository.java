@@ -17,7 +17,7 @@ public class AnswerRepository{
     }
 
 //    @Override
-    public boolean createEntity(Answer entity) {
+    public Answer createEntity(Answer entity) {
         return db.createEntity(Answer.class, entity);
     }
 
@@ -32,17 +32,17 @@ public class AnswerRepository{
     }
 
 //    @Override
-    public boolean updateEntityById(long id, Answer entity) {
+    public Answer updateEntityById(long id, Answer entity) {
         return db.updateEntityById(Answer.class, id, entity);
     }
 
 //    @Override
-    public boolean deleteEntityById(long id) {
+    public long deleteEntityById(long id) {
         return db.deleteEntityById(Answer.class, id);
     }
 
 //    @Override
-    public boolean deleteEntities(SearchCondition<Answer> condition) {
+    public Iterable<Long> deleteEntities(SearchCondition<Answer> condition) {
         return db.deleteEntities(Answer.class, condition);
     }
 }

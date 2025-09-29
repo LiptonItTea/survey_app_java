@@ -23,25 +23,25 @@ public class InMemoryDatabase extends Database {
     }
 
     @Override
-    protected <T extends DBEntity> boolean createEntity(Class<T> entityClass, T entity) {
+    protected <T extends DBEntity> T createEntity(Class<T> entityClass, T entity) {
         Map<Long, DBEntity> entityRepo = getEntityMap(entityClass);
         Long id = sequences.computeIfAbsent(entityClass, clz -> 0L);
 
         try {
             T e = entityClass.getConstructor(Long.class, entityClass).newInstance(id, entity);
             entityRepo.put(id, e);
+
+            sequences.put(entityClass, sequences.get(entityClass) + 1);
+            return e;
         }
         catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new IllegalArgumentException("Looks like your entity class is missing constructor, or your constructor is not public, or your class doesn't have constructor(Long, DBEntity). You dumbass.");
         }
-
-        sequences.put(entityClass, sequences.get(entityClass) + 1);
-        return true;
     }
 
     @Override
-    protected  <T extends DBEntity> DBEntity readEntityById(Class<T> entityClass, long id) {
-        return getEntityMap(entityClass).getOrDefault(id, null);
+    protected  <T extends DBEntity> T readEntityById(Class<T> entityClass, long id) {
+        return (T) getEntityMap(entityClass).get(id);
     }
 
     @Override
@@ -59,27 +59,27 @@ public class InMemoryDatabase extends Database {
     }
 
     @Override
-    protected <T extends DBEntity> boolean updateEntityById(Class<T> entityClass, long id, T entity) throws IllegalArgumentException{
+    protected <T extends DBEntity> T updateEntityById(Class<T> entityClass, long id, T entity) throws IllegalArgumentException{
         if (!getEntityMap(entityClass).containsKey(id))
-            return false;
+            return null;
 
         getEntityMap(entityClass).remove(id);
         getEntityMap(entityClass).put(id, entity);
 
-        return true;
+        return entity;
     }
 
     @Override
-    protected <T extends DBEntity> boolean deleteEntityById(Class<T> entityClass, long id) {
+    protected <T extends DBEntity> long deleteEntityById(Class<T> entityClass, long id) {
         if (!getEntityMap(entityClass).containsKey(id))
-            return false;
+            return -1;
 
         getEntityMap(entityClass).remove(id);
-        return true;
+        return id;
     }
 
     @Override
-    protected <T extends DBEntity> boolean deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
+    protected <T extends DBEntity> Iterable<Long> deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
         boolean result = false;
         ArrayList<Long> ids = new ArrayList<>();
 
@@ -98,6 +98,6 @@ public class InMemoryDatabase extends Database {
         for (Long id : ids)
             map.remove(id);
 
-        return result;
+        return ids;
     }
 }

@@ -17,7 +17,7 @@ public class UserRepository{
     }
 
 //    @Override
-    public boolean createEntity(User entity) {
+    public User createEntity(User entity) {
         return db.createEntity(User.class, entity);
     }
 
@@ -32,17 +32,17 @@ public class UserRepository{
     }
 
 //    @Override
-    public boolean updateEntityById(long id, User entity) {
+    public User updateEntityById(long id, User entity) {
         return db.updateEntityById(User.class, id, entity);
     }
 
 //    @Override
-    public boolean deleteEntityById(long id) {
+    public long deleteEntityById(long id) {
         return db.deleteEntityById(User.class, id);
     }
 
 //    @Override
-    public boolean deleteEntities(SearchCondition<User> condition) {
+    public Iterable<Long> deleteEntities(SearchCondition<User> condition) {
         return db.deleteEntities(User.class, condition);
     }
 }

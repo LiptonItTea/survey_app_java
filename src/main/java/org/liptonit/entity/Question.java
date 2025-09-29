@@ -1,7 +1,6 @@
 package org.liptonit.entity;
 
 public class Question extends DBEntity{
-    private long id;
     private String text;
     private boolean multipleAnswers;
     private long idSurvey;

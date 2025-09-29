@@ -17,7 +17,7 @@ public class CompletedSurveyRepository{
     }
 
 //    @Override
-    public boolean createEntity(CompletedSurvey entity) {
+    public CompletedSurvey createEntity(CompletedSurvey entity) {
         return db.createEntity(CompletedSurvey.class, entity);
     }
 
@@ -32,17 +32,17 @@ public class CompletedSurveyRepository{
     }
 
 //    @Override
-    public boolean updateEntityById(long id, CompletedSurvey entity) {
+    public CompletedSurvey updateEntityById(long id, CompletedSurvey entity) {
         return db.updateEntityById(CompletedSurvey.class, id, entity);
     }
 
 //    @Override
-    public boolean deleteEntityById(long id) {
+    public long deleteEntityById(long id) {
         return db.deleteEntityById(CompletedSurvey.class, id);
     }
 
 //    @Override
-    public boolean deleteEntities(SearchCondition<CompletedSurvey> condition) {
+    public Iterable<Long> deleteEntities(SearchCondition<CompletedSurvey> condition) {
         return db.deleteEntities(CompletedSurvey.class, condition);
     }
 }
