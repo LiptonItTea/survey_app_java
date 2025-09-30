@@ -3,6 +3,8 @@ package org.liptonit.db.repo;
 import org.liptonit.entity.CompletedSurvey;
 import org.liptonit.util.SearchCondition;
 
+import java.util.List;
+
 public class CompletedSurveyRepository{
     private Database db;
 
@@ -19,7 +21,7 @@ public class CompletedSurveyRepository{
     }
 
 //    @Override
-    public Iterable<CompletedSurvey> readEntities(SearchCondition<CompletedSurvey> condition) {
+    public List<CompletedSurvey> readEntities(SearchCondition<CompletedSurvey> condition) {
         return db.readEntities(CompletedSurvey.class, condition);
     }
 
@@ -34,7 +36,7 @@ public class CompletedSurveyRepository{
     }
 
 //    @Override
-    public Iterable<Long> deleteEntities(SearchCondition<CompletedSurvey> condition) {
+    public List<Long> deleteEntities(SearchCondition<CompletedSurvey> condition) {
         return db.deleteEntities(CompletedSurvey.class, condition);
     }
 }

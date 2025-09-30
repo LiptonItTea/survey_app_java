@@ -3,6 +3,8 @@ package org.liptonit.db.repo;
 import org.liptonit.entity.User;
 import org.liptonit.util.SearchCondition;
 
+import java.util.List;
+
 public class UserRepository{
     private Database db;
 
@@ -19,7 +21,7 @@ public class UserRepository{
     }
 
 //    @Override
-    public Iterable<User> readEntities(SearchCondition<User> condition) {
+    public List<User> readEntities(SearchCondition<User> condition) {
         return db.readEntities(User.class, condition);
     }
 
@@ -34,7 +36,7 @@ public class UserRepository{
     }
 
 //    @Override
-    public Iterable<Long> deleteEntities(SearchCondition<User> condition) {
+    public List<Long> deleteEntities(SearchCondition<User> condition) {
         return db.deleteEntities(User.class, condition);
     }
 }

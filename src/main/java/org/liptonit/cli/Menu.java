@@ -5,15 +5,10 @@ import org.liptonit.db.repo.AnswerRepository;
 import org.liptonit.db.repo.QuestionRepository;
 import org.liptonit.db.repo.SurveyRepository;
 import org.liptonit.db.repo.UserRepository;
-import org.liptonit.entity.Answer;
-import org.liptonit.entity.Question;
-import org.liptonit.entity.Survey;
-import org.liptonit.entity.User;
+import org.liptonit.entity.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class Menu {
     private static class Entry {
@@ -39,7 +34,7 @@ public class Menu {
                 System.out.print("Password > ");
                 String password = scanner.next();
 
-                UserRepository.getInstance(Vars.db).createEntity(new User(0, nickname, email, LocalDate.now(), password));
+                Vars.userRepository.createEntity(new User(0, nickname, email, LocalDate.now(), password));
                 return true;
             }),
 
@@ -50,10 +45,10 @@ public class Menu {
                 System.out.println("User password\n> ");
                 String password = scanner.next();
 
-                Iterable<User> all = UserRepository.getInstance(Vars.db).readEntities(
+                List<User> all = Vars.userRepository.readEntities(
                         u -> u.getNickname().equals(nickname) &&
                                     u.getHashedPassword().equals(password));
-                User u = all.iterator().next();
+                User u = all.getFirst();
 
                 if (u == null) {
                     System.out.println("No such user found.");
@@ -69,7 +64,7 @@ public class Menu {
                 System.out.print("New password, - if same\n> ");
                 String newPassword = scanner.next();
 
-                UserRepository.getInstance(Vars.db).updateEntityById(u.getId(), new User(
+                Vars.userRepository.updateEntityById(u.getId(), new User(
                         u.getId(),
                         newNickname.equals("-") ? nickname : newNickname,
                         email.equals("-") ? u.getEmail() : email,
@@ -86,37 +81,40 @@ public class Menu {
                 System.out.println("User password\n> ");
                 String password = scanner.next();
 
-                Iterable<User> all = UserRepository.getInstance(Vars.db).readEntities(
+                List<User> all = Vars.userRepository.readEntities(
                         u -> u.getNickname().equals(nickname) &&
                                 u.getHashedPassword().equals(password));
-                User u = all.iterator().next();
+                User u = all.getFirst();
 
                 if (u == null) {
                     System.out.println("No such user found.");
                     return false;
                 }
 
-                UserRepository.getInstance(Vars.db).deleteEntityById(u.getId());
+                Vars.userRepository.deleteEntityById(u.getId());
                 return true;
             }),
 
             new Entry("Create survey", scanner -> {
+                scanner.nextLine();
+
                 System.out.print("Survey name\n> ");
-                String name = scanner.next();
+                String name = scanner.nextLine();
 
                 System.out.print("Survey description\n> ");
-                String descr = scanner.next();
+                String descr = scanner.nextLine();
 
                 System.out.print("ID user creator\n> ");
                 long idUserCreator = scanner.nextLong();
 
-                long surveyId = SurveyRepository.getInstance(Vars.db).createEntity(new Survey(
+                long surveyId = Vars.surveyRepository.createEntity(new Survey(
                         0, name, descr, idUserCreator
                 )).getId();
 
+                scanner.nextLine();
                 while (true) {
                     System.out.print("Question text, - if no question\n> ");
-                    String qText = scanner.next();
+                    String qText = scanner.nextLine();
 
                     if (qText.equals("-"))
                         break;
@@ -124,20 +122,91 @@ public class Menu {
                     System.out.print("Multiple answers\n> ");
                     boolean multipleAnswers = scanner.nextBoolean();
 
-                    long questionId = QuestionRepository.getInstance(Vars.db).createEntity(new Question(
+                    long questionId = Vars.questionRepository.createEntity(new Question(
                             0, qText, multipleAnswers, surveyId
                     )).getId();
 
+                    scanner.nextLine();
                     while (true) {
-                        System.out.println("Answer text, - if no answer\n> ");
-                        String aText = scanner.next();
+                        System.out.print("Answer text, - if no answer\n> ");
+                        String aText = scanner.nextLine();
 
                         if (aText.equals("-"))
                             break;
 
-                        AnswerRepository.getInstance(Vars.db).createEntity(new Answer(
+                        Vars.answerRepository.createEntity(new Answer(
                                 0, aText, questionId
                         ));
+                    }
+                }
+
+                return true;
+            }),
+
+            new Entry("Conduct survey", scanner -> {
+                System.out.print("Survey ID\n> ");
+                long surveyId = scanner.nextLong();
+
+                System.out.println("User ID\n> ");
+                long userId = scanner.nextLong();
+
+                long completedSurveyId = Vars.completedSurveyRepository.createEntity(new CompletedSurvey(
+                        0, userId
+                )).getId();
+
+                Survey survey = Vars.surveyRepository.readEntityById(surveyId);
+                if (survey == null) {
+                    System.out.println("Can't find any survey with given ID.");
+                    return false;
+                }
+
+                List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == surveyId);
+                for (Question q : questions) {
+                    List<Answer> answers = Vars.answerRepository.readEntities(a -> a.getIdQuestion() == q.getId());
+
+                    System.out.println(q.getText());
+                    for (int i = 0; i < answers.size(); i++)
+                        System.out.println((i + 1) + ". " + answers.get(i).getText());
+
+                    int variant = scanner.nextInt();
+                    long answerId = answers.get(variant - 1).getId();
+                    Vars.questionAnswerRepository.createEntity(new QuestionAnswer(
+                            0, completedSurveyId, answerId
+                    ));
+                }
+                return true;
+            }),
+
+            new Entry("Get survey statistics", scanner -> {
+                System.out.print("Survey ID\n> ");
+                long surveyId = scanner.nextLong();
+
+                List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == surveyId);
+                Map<Long, List<Answer>> answersPerQuestion = new HashMap<>();
+
+                List<Answer> answers = new ArrayList<>();
+                for (Question q : questions) {
+                    List<Answer> temp = Vars.answerRepository.readEntities(a -> a.getIdQuestion() == q.getId());
+                    answersPerQuestion.put(q.getId(), temp);
+                    answers.addAll(temp);
+                }
+                Map<Long, Long> stats = new HashMap<>();
+                for (Answer a : answers)
+                    stats.put(a.getId(), 0L);
+
+                List<QuestionAnswer> questionAnswers = Vars.questionAnswerRepository.readEntities(quan -> stats.containsKey(quan.getIdAnswer()));
+                for (QuestionAnswer quan : questionAnswers) {
+                    stats.put(quan.getIdAnswer(), stats.get(quan.getIdAnswer()) + 1);
+                }
+
+                for (Question q : questions) {
+                    System.out.println(q.getText());
+
+                    List<Answer> temp = answersPerQuestion.get(q.getId());
+                    temp.sort(Comparator.comparingLong(DBEntity::getId));
+
+                    for (int i = 0; i < temp.size(); i++) {
+                        System.out.println((i + 1) + ". " + temp.get(i).getText() + ": " + stats.get(temp.get(i).getId()));
                     }
                 }
 

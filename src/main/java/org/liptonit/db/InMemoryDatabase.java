@@ -7,6 +7,7 @@ import org.liptonit.util.SearchCondition;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class InMemoryDatabase extends Database {
@@ -45,7 +46,7 @@ public class InMemoryDatabase extends Database {
     }
 
     @Override
-    protected <T extends DBEntity> Iterable<T> readEntities(Class<T> entityClass, SearchCondition<T> condition) {
+    protected <T extends DBEntity> List<T> readEntities(Class<T> entityClass, SearchCondition<T> condition) {
         ArrayList<T> list = new ArrayList<>();
 
         for (Map.Entry<Long, DBEntity> e : getEntityMap(entityClass).entrySet()) {
@@ -79,7 +80,7 @@ public class InMemoryDatabase extends Database {
     }
 
     @Override
-    protected <T extends DBEntity> Iterable<Long> deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
+    protected <T extends DBEntity> List<Long> deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
         boolean result = false;
         ArrayList<Long> ids = new ArrayList<>();
 
