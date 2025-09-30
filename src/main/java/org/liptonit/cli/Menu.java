@@ -141,22 +141,30 @@ public class Menu {
                 return true;
             }),
 
+            new Entry("List all surveys", scanner -> {
+                for (Survey s : Vars.surveyRepository.readEntities(s -> true))
+                    System.out.println(s);
+
+                return true;
+            }),
+
             new Entry("Conduct survey", scanner -> {
                 System.out.print("Survey ID\n> ");
-                long surveyId = scanner.nextLong();
-
-                System.out.println("User ID\n> ");
-                long userId = scanner.nextLong();
-
-                long completedSurveyId = Vars.completedSurveyRepository.createEntity(new CompletedSurvey(
-                        0, userId
-                )).getId();
+                long surveyId = Long.parseLong(scanner.nextLine());
 
                 Survey survey = Vars.surveyRepository.readEntityById(surveyId);
                 if (survey == null) {
                     System.out.println("Can't find any survey with given ID.");
                     return false;
                 }
+
+                System.out.print("User ID\n> ");
+                long userId = Long.parseLong(scanner.nextLine());
+                //todo check user
+
+                long completedSurveyId = Vars.completedSurveyRepository.createEntity(new CompletedSurvey(
+                        0, userId
+                )).getId();
 
                 List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == surveyId);
                 for (Question q : questions) {
@@ -166,7 +174,8 @@ public class Menu {
                     for (int i = 0; i < answers.size(); i++)
                         System.out.println((i + 1) + ". " + answers.get(i).getText());
 
-                    int variant = scanner.nextInt();
+                    System.out.print("> ");
+                    int variant = Integer.parseInt(scanner.nextLine());
                     long answerId = answers.get(variant - 1).getId();
                     Vars.questionAnswerRepository.createEntity(new QuestionAnswer(
                             0, completedSurveyId, answerId
@@ -177,7 +186,7 @@ public class Menu {
 
             new Entry("Get survey statistics", scanner -> {
                 System.out.print("Survey ID\n> ");
-                long surveyId = scanner.nextLong();
+                long surveyId = Long.parseLong(scanner.nextLine());
 
                 List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == surveyId);
                 Map<Long, List<Answer>> answersPerQuestion = new HashMap<>();
@@ -223,8 +232,7 @@ public class Menu {
 
             int index = 0;
             try {
-                String data = scanner.next();
-                index = Integer.parseInt(data);
+                index = Integer.parseInt(scanner.nextLine());
             }
             catch (NumberFormatException e) {
 //                System.err.println("Oops, wrong command!");
