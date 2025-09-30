@@ -5,16 +5,8 @@ import org.liptonit.util.SearchCondition;
 
 public class UserRepository{
     private Database db;
-    private static UserRepository instance;
 
     public UserRepository(Database db) {this.db = db;}
-
-    public static UserRepository getInstance(Database db) {
-        if (instance == null)
-            instance = new UserRepository(db);
-
-        return instance;
-    }
 
 //    @Override
     public User createEntity(User entity) {

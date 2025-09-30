@@ -5,16 +5,8 @@ import org.liptonit.util.SearchCondition;
 
 public class CompletedSurveyRepository{
     private Database db;
-    private static CompletedSurveyRepository instance;
 
     public CompletedSurveyRepository(Database db) {this.db = db;}
-
-    public static CompletedSurveyRepository getInstance(Database db) {
-        if (instance == null)
-            instance = new CompletedSurveyRepository(db);
-
-        return instance;
-    }
 
 //    @Override
     public CompletedSurvey createEntity(CompletedSurvey entity) {
