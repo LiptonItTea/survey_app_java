@@ -1,7 +1,7 @@
 package org.liptonit.entity;
 
 public abstract class DBEntity {
-    private long id;
+    private final long id;
 
     public DBEntity(long id) {this.id = id;}
 

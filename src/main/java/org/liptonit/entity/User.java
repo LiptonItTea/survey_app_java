@@ -3,10 +3,10 @@ package org.liptonit.entity;
 import java.time.LocalDate;
 
 public class User extends DBEntity{
-    private String nickname;
-    private String email;
-    private LocalDate registrationDate;
-    private String hashedPassword;
+    private final String nickname;
+    private final String email;
+    private final LocalDate registrationDate;
+    private final String hashedPassword;
 
     public User(long id, String nickname, String email, LocalDate registrationDate, String hashedPassword) {
         super(id);
@@ -58,10 +58,8 @@ public class User extends DBEntity{
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("ID: ").append(getId())
-                .append("\nNickname: ").append(nickname)
-                .append("\nRegistration date: ").append(registrationDate);
-        return builder.toString();
+        return "ID: " + getId() +
+                "\nNickname: " + nickname +
+                "\nRegistration date: " + registrationDate;
     }
 }

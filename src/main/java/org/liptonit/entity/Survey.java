@@ -1,9 +1,9 @@
 package org.liptonit.entity;
 
 public class Survey extends DBEntity{
-    private String name;
-    private String description;
-    private long idUserCreator;
+    private final String name;
+    private final String description;
+    private final long idUserCreator;
 
     public Survey(long id, String name, String description, long idUserCreator) {
         super(id);
@@ -29,5 +29,13 @@ public class Survey extends DBEntity{
 
     public long getIdUserCreator() {
         return idUserCreator;
+    }
+
+    @Override
+    public String toString() {
+        return "ID: " + getId() +
+                "\nName: " + this.name +
+                "\nDescription: " + this.description +
+                "\nId user creator: " + this.idUserCreator;
     }
 }

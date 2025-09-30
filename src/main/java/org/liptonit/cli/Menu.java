@@ -1,10 +1,6 @@
 package org.liptonit.cli;
 
 import org.liptonit.Vars;
-import org.liptonit.db.repo.AnswerRepository;
-import org.liptonit.db.repo.QuestionRepository;
-import org.liptonit.db.repo.SurveyRepository;
-import org.liptonit.db.repo.UserRepository;
 import org.liptonit.entity.*;
 
 import java.time.LocalDate;
@@ -26,13 +22,13 @@ public class Menu {
                 System.out.println("To register user, you will need nickname, email and password");
 
                 System.out.print("Nickname > ");
-                String nickname = scanner.next();
+                String nickname = scanner.nextLine();
 
                 System.out.print("Email > ");
-                String email = scanner.next();
+                String email = scanner.nextLine();
 
                 System.out.print("Password > ");
-                String password = scanner.next();
+                String password = scanner.nextLine();
 
                 Vars.userRepository.createEntity(new User(0, nickname, email, LocalDate.now(), password));
                 return true;
@@ -40,10 +36,10 @@ public class Menu {
 
             new Entry("Edit user", scanner -> {
                 System.out.print("User nickname\n> ");
-                String nickname = scanner.next();
+                String nickname = scanner.nextLine();
 
                 System.out.println("User password\n> ");
-                String password = scanner.next();
+                String password = scanner.nextLine();
 
                 List<User> all = Vars.userRepository.readEntities(
                         u -> u.getNickname().equals(nickname) &&
@@ -56,13 +52,13 @@ public class Menu {
                 }
 
                 System.out.print("New nickname, - if same\n> ");
-                String newNickname = scanner.next();
+                String newNickname = scanner.nextLine();
 
                 System.out.print("New email, - if same\n> ");
-                String email = scanner.next();
+                String email = scanner.nextLine();
 
                 System.out.print("New password, - if same\n> ");
-                String newPassword = scanner.next();
+                String newPassword = scanner.nextLine();
 
                 Vars.userRepository.updateEntityById(u.getId(), new User(
                         u.getId(),
@@ -76,10 +72,10 @@ public class Menu {
 
             new Entry("Delete user", scanner -> {
                 System.out.print("User nickname\n> ");
-                String nickname = scanner.next();
+                String nickname = scanner.nextLine();
 
                 System.out.println("User password\n> ");
-                String password = scanner.next();
+                String password = scanner.nextLine();
 
                 List<User> all = Vars.userRepository.readEntities(
                         u -> u.getNickname().equals(nickname) &&
@@ -95,9 +91,13 @@ public class Menu {
                 return true;
             }),
 
-            new Entry("Create survey", scanner -> {
-                scanner.nextLine();
+            new Entry("List all users", scanner -> {
+                for (User u : Vars.userRepository.readEntities(u -> true))
+                    System.out.println(u);
+                return true;
+            }),
 
+            new Entry("Create survey", scanner -> {
                 System.out.print("Survey name\n> ");
                 String name = scanner.nextLine();
 
@@ -105,13 +105,12 @@ public class Menu {
                 String descr = scanner.nextLine();
 
                 System.out.print("ID user creator\n> ");
-                long idUserCreator = scanner.nextLong();
+                long idUserCreator = Long.parseLong(scanner.nextLine());
 
                 long surveyId = Vars.surveyRepository.createEntity(new Survey(
                         0, name, descr, idUserCreator
                 )).getId();
 
-                scanner.nextLine();
                 while (true) {
                     System.out.print("Question text, - if no question\n> ");
                     String qText = scanner.nextLine();
@@ -120,13 +119,12 @@ public class Menu {
                         break;
 
                     System.out.print("Multiple answers\n> ");
-                    boolean multipleAnswers = scanner.nextBoolean();
+                    boolean multipleAnswers = Boolean.parseBoolean(scanner.nextLine());
 
                     long questionId = Vars.questionRepository.createEntity(new Question(
                             0, qText, multipleAnswers, surveyId
                     )).getId();
 
-                    scanner.nextLine();
                     while (true) {
                         System.out.print("Answer text, - if no answer\n> ");
                         String aText = scanner.nextLine();

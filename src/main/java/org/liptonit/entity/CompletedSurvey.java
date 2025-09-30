@@ -1,7 +1,7 @@
 package org.liptonit.entity;
 
 public class CompletedSurvey extends DBEntity{
-    private long idUser;
+    private final long idUser;
 
     public CompletedSurvey(long id, long idUser) {
         super(id);
