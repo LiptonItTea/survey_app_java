@@ -1,7 +1,7 @@
 package org.liptonit.db;
 
-import org.liptonit.db.repo.Database;
 import org.liptonit.entity.DBEntity;
+import org.liptonit.util.Patcher;
 import org.liptonit.util.SearchCondition;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,7 +42,7 @@ public class InMemoryDatabase extends Database {
 
     @Override
     protected  <T extends DBEntity> T readEntityById(Class<T> entityClass, long id) {
-        return (T) getEntityMap(entityClass).get(id);
+        return (T) getEntityMap(entityClass).get(id); // this is fine
     }
 
     @Override
@@ -60,23 +60,40 @@ public class InMemoryDatabase extends Database {
     }
 
     @Override
-    protected <T extends DBEntity> T updateEntityById(Class<T> entityClass, long id, T entity) throws IllegalArgumentException{
+    protected <T extends DBEntity> T updateEntityById(Class<T> entityClass, long id, Patcher<T> patcher) throws IllegalArgumentException{
+        Map<Long, DBEntity> map = getEntityMap(entityClass);
         if (!getEntityMap(entityClass).containsKey(id))
             return null;
 
-        getEntityMap(entityClass).remove(id);
-        getEntityMap(entityClass).put(id, entity);
+        T t = (T) map.get(id); // this is fine
+        patcher.patch(t);
 
-        return entity;
+        return t;
     }
 
     @Override
-    protected <T extends DBEntity> long deleteEntityById(Class<T> entityClass, long id) {
-        if (!getEntityMap(entityClass).containsKey(id))
-            return -1;
+    protected <T extends DBEntity> List<T> updateEntities(Class<T> entityClass, SearchCondition<T> condition, Patcher<T> patcher) {
+        Map<Long, DBEntity> map = getEntityMap(entityClass);
 
-        getEntityMap(entityClass).remove(id);
-        return id;
+        List<T> result = new ArrayList<>();
+        for (Map.Entry<Long, DBEntity> e : map.entrySet()) {
+            T t = (T) e.getValue(); // this is fine
+
+            if (condition.select(t)) {
+                patcher.patch(t);
+                result.add(t);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    protected <T extends DBEntity> T deleteEntityById(Class<T> entityClass, long id) {
+        if (!getEntityMap(entityClass).containsKey(id))
+            return null;
+
+        return (T) getEntityMap(entityClass).remove(id); // this is fine
     }
 
     @Override

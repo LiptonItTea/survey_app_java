@@ -3,10 +3,10 @@ package org.liptonit.entity;
 import java.time.LocalDate;
 
 public class User extends DBEntity{
-    private final String nickname;
-    private final String email;
-    private final LocalDate registrationDate;
-    private final String hashedPassword;
+    private String nickname;
+    private String email;
+    private LocalDate registrationDate;
+    private String hashedPassword;
 
     public User(long id, String nickname, String email, LocalDate registrationDate, String hashedPassword) {
         super(id);
@@ -40,21 +40,21 @@ public class User extends DBEntity{
         return hashedPassword;
     }
 
-//    public void setNickname(String nickname) {
-//        this.nickname = nickname;
-//    }
-//
-//    public void setEmail(String email) {
-//        this.email = email;
-//    }
-//
-//    public void setRegistrationDate(LocalDate registrationDate) {
-//        this.registrationDate = registrationDate;
-//    }
-//
-//    public void setHashedPassword(String hashedPassword) {
-//        this.hashedPassword = hashedPassword;
-//    }
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setRegistrationDate(LocalDate registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+    }
 
     @Override
     public String toString() {
