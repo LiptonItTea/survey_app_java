@@ -109,33 +109,33 @@ public class Menu {
                         0, name, descr, idUserCreator
                 )).getId();
 
-//                while (true) {
-//                    System.out.print("Question text, - if no question\n> ");
-//                    String qText = scanner.nextLine();
-//
-//                    if (qText.equals("-"))
-//                        break;
-//
-//                    System.out.print("Multiple answers\n> ");
-//                    boolean multipleAnswers = Boolean.parseBoolean(scanner.nextLine());
-//
-//                    long questionId = Vars.questionRepository.createEntity(new Question(
-//                            0, qText, multipleAnswers, surveyId
-//                    )).getId();
-//
-//                    while (true) {
-//                        System.out.print("Answer text, - if no answer\n> ");
-//                        String aText = scanner.nextLine();
-//
-//                        if (aText.equals("-"))
-//                            break;
-//
-//                        Vars.answerRepository.createEntity(new Answer(
-//                                0, aText, questionId
-//                        ));
-//                    }
-//                }
-//
+                while (true) {
+                    System.out.print("Question text, - if no question\n> ");
+                    String qText = scanner.nextLine();
+
+                    if (qText.equals("-"))
+                        break;
+
+                    System.out.print("Multiple answers\n> ");
+                    boolean multipleAnswers = Boolean.parseBoolean(scanner.nextLine());
+
+                    long questionId = Vars.questionRepository.createEntity(new Question(
+                            0, qText, multipleAnswers, surveyId
+                    )).getId();
+
+                    while (true) {
+                        System.out.print("Answer text, - if no answer\n> ");
+                        String aText = scanner.nextLine();
+
+                        if (aText.equals("-"))
+                            break;
+
+                        Vars.answerRepository.createEntity(new Answer(
+                                0, aText, questionId
+                        ));
+                    }
+                }
+
                 return true;
             }),
 
@@ -144,79 +144,79 @@ public class Menu {
                     System.out.println(s);
 
                 return true;
-            })//,
+            }),
 
-//            new Entry("Conduct survey", scanner -> {
-//                System.out.print("Survey ID\n> ");
-//                long surveyId = Long.parseLong(scanner.nextLine());
-//
-//                Survey survey = Vars.surveyRepository.readEntityById(surveyId);
-//                if (survey == null) {
-//                    System.out.println("Can't find any survey with given ID.");
-//                    return false;
-//                }
-//
-//                System.out.print("User ID\n> ");
-//                long userId = Long.parseLong(scanner.nextLine());
-//                //todo check user
-//
-//                long completedSurveyId = Vars.completedSurveyRepository.createEntity(new CompletedSurvey(
-//                        0, userId
-//                )).getId();
-//
-//                List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == surveyId);
-//                for (Question q : questions) {
-//                    List<Answer> answers = Vars.answerRepository.readEntities(a -> a.getIdQuestion() == q.getId());
-//
-//                    System.out.println(q.getText());
-//                    for (int i = 0; i < answers.size(); i++)
-//                        System.out.println((i + 1) + ". " + answers.get(i).getText());
-//
-//                    System.out.print("> ");
-//                    int variant = Integer.parseInt(scanner.nextLine());
-//                    long answerId = answers.get(variant - 1).getId();
-//                    Vars.questionAnswerRepository.createEntity(new QuestionAnswer(
-//                            0, completedSurveyId, answerId
-//                    ));
-//                }
-//                return true;
-//            }),
-//
-//            new Entry("Get survey statistics", scanner -> {
-//                System.out.print("Survey ID\n> ");
-//                long surveyId = Long.parseLong(scanner.nextLine());
-//
-//                List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == surveyId);
-//                Map<Long, List<Answer>> answersPerQuestion = new HashMap<>();
-//
-//                List<Answer> answers = new ArrayList<>();
-//                for (Question q : questions) {
-//                    List<Answer> temp = Vars.answerRepository.readEntities(a -> a.getIdQuestion() == q.getId());
-//                    answersPerQuestion.put(q.getId(), temp);
-//                    answers.addAll(temp);
-//                }
-//                Map<Long, Long> stats = new HashMap<>();
-//                for (Answer a : answers)
-//                    stats.put(a.getId(), 0L);
-//
-//                List<QuestionAnswer> questionAnswers = Vars.questionAnswerRepository.readEntities(quan -> stats.containsKey(quan.getIdAnswer()));
-//                for (QuestionAnswer quan : questionAnswers) {
-//                    stats.put(quan.getIdAnswer(), stats.get(quan.getIdAnswer()) + 1);
-//                }
-//
-//                for (Question q : questions) {
-//                    System.out.println(q.getText());
-//
-//                    List<Answer> temp = answersPerQuestion.get(q.getId());
-//                    temp.sort(Comparator.comparingLong(DBEntity::getId));
-//
-//                    for (int i = 0; i < temp.size(); i++) {
-//                        System.out.println((i + 1) + ". " + temp.get(i).getText() + ": " + stats.get(temp.get(i).getId()));
-//                    }
-//                }
-//
-//                return true;
-//            })
+            new Entry("Conduct survey", scanner -> {
+                System.out.print("Survey ID\n> ");
+                long surveyId = Long.parseLong(scanner.nextLine());
+
+                Survey survey = Vars.surveyRepository.readEntityById(surveyId);
+                if (survey == null) {
+                    System.out.println("Can't find any survey with given ID.");
+                    return false;
+                }
+
+                System.out.print("User ID\n> ");
+                long userId = Long.parseLong(scanner.nextLine());
+                //todo check user
+
+                long completedSurveyId = Vars.completedSurveyRepository.createEntity(new CompletedSurvey(
+                        0, userId
+                )).getId();
+
+                List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == surveyId);
+                for (Question q : questions) {
+                    List<Answer> answers = Vars.answerRepository.readEntities(a -> a.getIdQuestion() == q.getId());
+
+                    System.out.println(q.getText());
+                    for (int i = 0; i < answers.size(); i++)
+                        System.out.println((i + 1) + ". " + answers.get(i).getText());
+
+                    System.out.print("> ");
+                    int variant = Integer.parseInt(scanner.nextLine());
+                    long answerId = answers.get(variant - 1).getId();
+                    Vars.questionAnswerRepository.createEntity(new QuestionAnswer(
+                            0, completedSurveyId, answerId
+                    ));
+                }
+                return true;
+            }),
+
+            new Entry("Get survey statistics", scanner -> {
+                System.out.print("Survey ID\n> ");
+                long surveyId = Long.parseLong(scanner.nextLine());
+
+                List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == surveyId);
+                Map<Long, List<Answer>> answersPerQuestion = new HashMap<>();
+
+                List<Answer> answers = new ArrayList<>();
+                for (Question q : questions) {
+                    List<Answer> temp = Vars.answerRepository.readEntities(a -> a.getIdQuestion() == q.getId());
+                    answersPerQuestion.put(q.getId(), temp);
+                    answers.addAll(temp);
+                }
+                Map<Long, Long> stats = new HashMap<>();
+                for (Answer a : answers)
+                    stats.put(a.getId(), 0L);
+
+                List<QuestionAnswer> questionAnswers = Vars.questionAnswerRepository.readEntities(quan -> stats.containsKey(quan.getIdAnswer()));
+                for (QuestionAnswer quan : questionAnswers) {
+                    stats.put(quan.getIdAnswer(), stats.get(quan.getIdAnswer()) + 1);
+                }
+
+                for (Question q : questions) {
+                    System.out.println(q.getText());
+
+                    List<Answer> temp = answersPerQuestion.get(q.getId());
+                    temp.sort(Comparator.comparingLong(DBEntity::getId));
+
+                    for (int i = 0; i < temp.size(); i++) {
+                        System.out.println((i + 1) + ". " + temp.get(i).getText() + ": " + stats.get(temp.get(i).getId()));
+                    }
+                }
+
+                return true;
+            })
     };
     public static void run() {
         for (int i = 0; i < entries.length; i++) {
