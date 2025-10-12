@@ -7,7 +7,7 @@ import org.liptonit.util.SearchCondition;
 import java.util.List;
 
 public abstract class Database {
-    protected abstract  <T extends DBEntity> T createEntity(Class<T> entityClass, T entity);
+    protected abstract <T extends DBEntity> T createEntity(Class<T> entityClass, T entity);
 
     protected abstract <T extends DBEntity> T readEntityById(Class<T> entityClass, long id);
 

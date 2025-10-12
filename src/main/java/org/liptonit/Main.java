@@ -23,5 +23,5 @@ public class Main {
             Vars.answerRepository.createEntity(new Answer(0, "take a chill pill brother", 1));
 
         Menu.run();
-    }
+    }   
 }
