@@ -76,7 +76,7 @@ public class Scenarios {
                     0, qText, multipleAnswers, surveyId
             )).getId();
 
-            for (int j = 0; j < answerTexts.length; j++) {
+            for (int j = 0; j < answerTexts[i].length; j++) {
                 String aText = answerTexts[i][j];
 
                 Vars.answerRepository.createEntity(new Answer(
