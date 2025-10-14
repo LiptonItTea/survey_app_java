@@ -1,5 +1,7 @@
 package org.liptonit.entity;
 
+import java.util.Objects;
+
 public class QuestionAnswer extends DBEntity{
     private long idCompletedSurvey;
     private long idAnswer;
@@ -30,5 +32,18 @@ public class QuestionAnswer extends DBEntity{
 
     public void setIdAnswer(long idAnswer) {
         this.idAnswer = idAnswer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        QuestionAnswer that = (QuestionAnswer) o;
+        return idCompletedSurvey == that.idCompletedSurvey && idAnswer == that.idAnswer;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), idCompletedSurvey, idAnswer);
     }
 }

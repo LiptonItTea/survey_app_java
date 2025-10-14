@@ -1,6 +1,7 @@
 package org.liptonit.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class User extends DBEntity{
     private String nickname;
@@ -54,6 +55,19 @@ public class User extends DBEntity{
 
     public void setHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        User user = (User) o;
+        return Objects.equals(nickname, user.nickname) && Objects.equals(email, user.email) && Objects.equals(registrationDate, user.registrationDate) && Objects.equals(hashedPassword, user.hashedPassword);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), nickname, email, registrationDate, hashedPassword);
     }
 
     @Override

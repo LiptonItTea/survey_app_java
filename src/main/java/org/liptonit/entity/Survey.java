@@ -1,5 +1,7 @@
 package org.liptonit.entity;
 
+import java.util.Objects;
+
 public class Survey extends DBEntity{
     private String name;
     private String description;
@@ -49,5 +51,18 @@ public class Survey extends DBEntity{
                 "\nName: " + this.name +
                 "\nDescription: " + this.description +
                 "\nId user creator: " + this.idUserCreator;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Survey survey = (Survey) o;
+        return idUserCreator == survey.idUserCreator && Objects.equals(name, survey.name) && Objects.equals(description, survey.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name, description, idUserCreator);
     }
 }

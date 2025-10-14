@@ -1,5 +1,7 @@
 package org.liptonit.entity;
 
+import java.util.Objects;
+
 public class Question extends DBEntity{
     private String text;
     private boolean multipleAnswers;
@@ -29,6 +31,19 @@ public class Question extends DBEntity{
 
     public long getIdSurvey() {
         return idSurvey;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Question question = (Question) o;
+        return multipleAnswers == question.multipleAnswers && idSurvey == question.idSurvey && Objects.equals(text, question.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), text, multipleAnswers, idSurvey);
     }
 
     public void setText(String text) {
