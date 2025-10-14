@@ -146,6 +146,7 @@ public class Scenarios {
         for (Question q : questions) {
             List<Answer> temp = Vars.answerRepository.readEntities(a -> a.getIdQuestion() == q.getId());
 
+            stats.put(q, new HashMap<>());
             for (Answer answer : temp) {
                 stats.get(q).put(answer, 0L);
                 answerToQuestions.put(answer.getId(), q.getId());

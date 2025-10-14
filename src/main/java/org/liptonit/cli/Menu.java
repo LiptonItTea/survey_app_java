@@ -203,9 +203,14 @@ public class Menu {
                             currentUser.getNickname(), currentUser.getHashedPassword(), surveyId
                     );
 
+                    if (stats == null) {
+                        System.out.println("Something went wrong.");
+                        return false;
+                    }
+
                     for (Map.Entry<Question, Map<Answer, Long>> e : stats.entrySet()) {
                         Question question = e.getKey();
-                        System.out.println(question);
+                        System.out.println(question.getText());
 
                         int i = 0;
                         for (Map.Entry<Answer, Long> stat : e.getValue().entrySet()) {
