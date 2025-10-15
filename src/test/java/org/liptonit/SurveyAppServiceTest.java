@@ -8,17 +8,17 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ScenariosTest {
+public class SurveyAppServiceTest {
 
     @Test
     void testSignInSuccessful() {
         // Arrange
         String nickname = "testuser_success";
         String password = "password";
-        User signedUpUser = Scenarios.signUp(nickname, "test_success@example.com", password);
+        User signedUpUser = SurveyAppService.signUp(nickname, "test_success@example.com", password);
 
         // Act
-        User user = Scenarios.signIn(nickname, password);
+        User user = SurveyAppService.signIn(nickname, password);
 
         // Assert
         assertNotNull(user);
@@ -31,10 +31,10 @@ public class ScenariosTest {
         // Arrange
         String nickname = "testuser_wrongpass";
         String password = "password";
-        Scenarios.signUp(nickname, "test_wrongpass@example.com", password);
+        SurveyAppService.signUp(nickname, "test_wrongpass@example.com", password);
 
         // Act
-        User user = Scenarios.signIn(nickname, "wrongpassword");
+        User user = SurveyAppService.signIn(nickname, "wrongpassword");
 
         // Assert
         assertNull(user);
@@ -43,7 +43,7 @@ public class ScenariosTest {
     @Test
     void testSignInNonExistentUser() {
         // Act
-        User user = Scenarios.signIn("nonexistentuser", "password");
+        User user = SurveyAppService.signIn("nonexistentuser", "password");
 
         // Assert
         assertNull(user);
@@ -52,7 +52,7 @@ public class ScenariosTest {
     @Test
     void testCreateSurveySuccessful() {
         // Arrange
-        User user = Scenarios.signUp("testuser_survey", "test_survey@example.com", "password");
+        User user = SurveyAppService.signUp("testuser_survey", "test_survey@example.com", "password");
         String surveyName = "Test Survey";
         String surveyDescription = "This is a test survey.";
         String[] questionTexts = {"Question 1", "Question 2"};
@@ -60,7 +60,7 @@ public class ScenariosTest {
         String[][] answerTexts = {{"Answer 1.1", "Answer 1.2"}, {"Answer 2.1", "Answer 2.2"}};
 
         // Act
-        Survey survey = Scenarios.createSurvey(user.getNickname(), "password", surveyName, surveyDescription, questionTexts, questionMultipleAnswers, answerTexts);
+        Survey survey = SurveyAppService.createSurvey(user.getNickname(), "password", surveyName, surveyDescription, questionTexts, questionMultipleAnswers, answerTexts);
 
         // Assert
         assertNotNull(survey);
@@ -89,8 +89,8 @@ public class ScenariosTest {
     @Test
     void testConductSurveySuccessful() {
         // Arrange
-        User user = Scenarios.signUp("testuser_conduct", "test_conduct@example.com", "password");
-        Survey survey = Scenarios.createSurvey(user.getNickname(), "password", "Test Survey", "Description", new String[]{"Q1"}, new Boolean[]{false}, new String[][]{{"A1", "A2"}});
+        User user = SurveyAppService.signUp("testuser_conduct", "test_conduct@example.com", "password");
+        Survey survey = SurveyAppService.createSurvey(user.getNickname(), "password", "Test Survey", "Description", new String[]{"Q1"}, new Boolean[]{false}, new String[][]{{"A1", "A2"}});
         List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == survey.getId());
         List<Answer> answers = Vars.answerRepository.readEntities(a -> a.getIdQuestion() == questions.getFirst().getId());
 
@@ -98,7 +98,7 @@ public class ScenariosTest {
         Long[][] answerIds = {{answers.getFirst().getId()}};
 
         // Act
-        CompletedSurvey completedSurvey = Scenarios.conductSurvey(user.getNickname(), "password", survey.getId(), questionIds, answerIds);
+        CompletedSurvey completedSurvey = SurveyAppService.conductSurvey(user.getNickname(), "password", survey.getId(), questionIds, answerIds);
 
         // Assert
         assertNotNull(completedSurvey);
@@ -112,18 +112,18 @@ public class ScenariosTest {
     @Test
     void testGetSurveyStatisticsSuccessful() {
         // Arrange
-        User user = Scenarios.signUp("testuser_stats", "test_stats@example.com", "password");
-        Survey survey = Scenarios.createSurvey(user.getNickname(), "password", "Test Survey", "Description", new String[]{"Q1"}, new Boolean[]{false}, new String[][]{{"A1", "A2"}});
+        User user = SurveyAppService.signUp("testuser_stats", "test_stats@example.com", "password");
+        Survey survey = SurveyAppService.createSurvey(user.getNickname(), "password", "Test Survey", "Description", new String[]{"Q1"}, new Boolean[]{false}, new String[][]{{"A1", "A2"}});
         List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == survey.getId());
         List<Answer> answers = Vars.answerRepository.readEntities(a -> a.getIdQuestion() == questions.getFirst().getId());
 
         Long[] questionIds = {questions.getFirst().getId()};
         Long[][] answerIds = {{answers.getFirst().getId()}};
 
-        Scenarios.conductSurvey(user.getNickname(), "password", survey.getId(), questionIds, answerIds);
+        SurveyAppService.conductSurvey(user.getNickname(), "password", survey.getId(), questionIds, answerIds);
 
         // Act
-        Map<Question, Map<Answer, Long>> stats = Scenarios.getSurveyStatistics(user.getNickname(), "password", survey.getId());
+        Map<Question, Map<Answer, Long>> stats = SurveyAppService.getSurveyStatistics(user.getNickname(), "password", survey.getId());
 
         // Assert
         assertNotNull(stats);

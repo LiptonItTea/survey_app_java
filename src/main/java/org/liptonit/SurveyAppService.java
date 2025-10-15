@@ -5,7 +5,7 @@ import org.liptonit.entity.*;
 import java.time.LocalDate;
 import java.util.*;
 
-public class Scenarios {
+public class SurveyAppService {
     public static User signIn(String nickname, String password) {
         List<User> users = Vars.userRepository.readEntities(u -> u.getNickname().equals(nickname) &&
                 u.getHashedPassword().equals(password));

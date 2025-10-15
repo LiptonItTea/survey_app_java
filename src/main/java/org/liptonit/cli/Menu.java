@@ -1,10 +1,9 @@
 package org.liptonit.cli;
 
-import org.liptonit.Scenarios;
+import org.liptonit.SurveyAppService;
 import org.liptonit.Vars;
 import org.liptonit.entity.*;
 
-import java.time.LocalDate;
 import java.util.*;
 
 public class Menu {
@@ -31,7 +30,7 @@ public class Menu {
                     System.out.print("Password:\n> ");
                     String password = scanner.nextLine();
 
-                    User u = Scenarios.signIn(nickname, password);
+                    User u = SurveyAppService.signIn(nickname, password);
                     if (u == null) {
                         System.out.print("No such user found\n");
                         return false;
@@ -51,7 +50,7 @@ public class Menu {
                     System.out.print("Password:\n> ");
                     String password = scanner.nextLine();
 
-                    User u = Scenarios.signUp(nickname, email, password);
+                    User u = SurveyAppService.signUp(nickname, email, password);
                     if (u == null) {
                         System.out.print("User with such nickname has already been registered.");
                         return false;
@@ -74,7 +73,7 @@ public class Menu {
                     System.out.print("New password, - if same\n> ");
                     String newPassword = scanner.nextLine();
 
-                    User u = Scenarios.editUser(currentUser.getNickname(), currentUser.getHashedPassword(), newNickname, email, newPassword);
+                    User u = SurveyAppService.editUser(currentUser.getNickname(), currentUser.getHashedPassword(), newNickname, email, newPassword);
                     if (u == null) {
                         System.out.print("Something went wrong.\n");
                         return false;
@@ -85,7 +84,7 @@ public class Menu {
                 }),
 
                 new Entry("Delete user", scanner -> {
-                    User u = Scenarios.deleteUser(currentUser.getNickname(), currentUser.getHashedPassword());
+                    User u = SurveyAppService.deleteUser(currentUser.getNickname(), currentUser.getHashedPassword());
 
                     if (u == null) {
                         System.out.print("Something went wrong.\n");
@@ -128,7 +127,7 @@ public class Menu {
                         answers.add(questionAnswers.toArray(new String[0]));
                     }
 
-                    Survey survey = Scenarios.createSurvey(
+                    Survey survey = SurveyAppService.createSurvey(
                             currentUser.getNickname(), currentUser.getHashedPassword(),
                             name, descr,
                             questionTexts.toArray(new String[0]), questionMultipleAnswers.toArray(new Boolean[0]), answers.toArray(new String[0][0]));
@@ -183,7 +182,7 @@ public class Menu {
                         answerIds.add(questionAnswers.toArray(new Long[0]));
                     }
 
-                    CompletedSurvey completedSurvey = Scenarios.conductSurvey(
+                    CompletedSurvey completedSurvey = SurveyAppService.conductSurvey(
                             currentUser.getNickname(), currentUser.getHashedPassword(),
                             surveyId, questionIds.toArray(new Long[0]), answerIds.toArray(new Long[0][0])
                     );
@@ -199,7 +198,7 @@ public class Menu {
                     System.out.print("Survey ID\n> ");
                     long surveyId = Long.parseLong(scanner.nextLine());
 
-                    Map<Question, Map<Answer, Long>> stats = Scenarios.getSurveyStatistics(
+                    Map<Question, Map<Answer, Long>> stats = SurveyAppService.getSurveyStatistics(
                             currentUser.getNickname(), currentUser.getHashedPassword(), surveyId
                     );
 
