@@ -150,6 +150,9 @@ public class Menu {
                         return false;
                     }
 
+                    System.out.println("Survey name: " + survey.getName());
+                    System.out.println("Survey description: " + survey.getDescription());
+
                     List<Question> questions = Vars.questionRepository.readEntities(q -> q.getIdSurvey() == surveyId);
                     ArrayList<Long> questionIds = new ArrayList<>();
                     ArrayList<Long[]> answerIds = new ArrayList<>();
@@ -276,8 +279,6 @@ public class Menu {
 
     public static void run() {
         Scanner scanner = new Scanner(System.in);
-
-        // todo how2test?
 
         swap(start);
         poll(scanner);
