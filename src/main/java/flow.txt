@@ -1,0 +1,16 @@
+Interfaces
+    Model<T>
+        repo<T>
+
+        addEntity<T> - implement logic for adding entity to repo
+        getEntityById
+        modifyEntityById
+        deleteEntityById
+
+    Repository<T>
+        addEntity<T>
+        getEntity<T>
+        updateEntity
+        deleteEntity
+
+    DB implements Repo<User> Repo <Survey>
