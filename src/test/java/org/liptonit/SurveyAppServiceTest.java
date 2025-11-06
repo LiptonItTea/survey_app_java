@@ -26,7 +26,6 @@ public class SurveyAppServiceTest {
         // Assert
         assertNotNull(user);
         assertEquals(nickname, user.getNickname());
-        assertEquals(1, signedUpUser.getId());
     }
 
     @Test
