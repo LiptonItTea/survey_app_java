@@ -5,10 +5,7 @@ import org.liptonit.util.Patcher;
 import org.liptonit.util.SearchCondition;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryDatabase extends Database {
     private Map<Class<? extends DBEntity>, Map<Long, DBEntity>> repo;
@@ -97,9 +94,10 @@ public class InMemoryDatabase extends Database {
     }
 
     @Override
-    protected <T extends DBEntity> List<Long> deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
+    protected <T extends DBEntity> List<T> deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
         boolean result = false;
         ArrayList<Long> ids = new ArrayList<>();
+        ArrayList<T> entities = new ArrayList<>();
 
         Map<Long, DBEntity> map = getEntityMap(entityClass);
 
@@ -110,12 +108,13 @@ public class InMemoryDatabase extends Database {
                 result = true;
 
                 ids.add(e.getKey());
+                entities.add(t);
             }
         }
 
         for (Long id : ids)
             map.remove(id);
 
-        return ids;
+        return entities;
     }
 }

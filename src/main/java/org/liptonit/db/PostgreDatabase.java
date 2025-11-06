@@ -149,14 +149,45 @@ public class PostgreDatabase extends Database{
 
     @Override
     protected <T extends DBEntity> T deleteEntityById(Class<T> entityClass, long id) {
-        // todo classname -> sql
-        return null;
+        T entity = readEntityById(entityClass, id);
+        List<T> temp = new ArrayList<>(); temp.add(entity);
+        String tableName = getTableName(entityClass);
+
+        var result = deleteEntitiesSql(entityClass, temp, tableName);
+        String sql = result.getKey();
+        List<Object> values = result.getValue();
+
+        try (var stmt = connection.prepareStatement(sql)) {
+            for (int i = 0; i < values.size(); i++)
+                stmt.setObject(i + 1, values.get(i));
+            stmt.executeUpdate();
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return entity;
     }
 
     @Override
-    protected <T extends DBEntity> List<Long> deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
-        // todo classname -> sql (SELECT * ), obj -> sql, then filter neccessary objects, then delete
-        return List.of();
+    protected <T extends DBEntity> List<T> deleteEntities(Class<T> entityClass, SearchCondition<T> condition) {
+        List<T> entities = readEntities(entityClass, condition);
+        String tableName = getTableName(entityClass);
+
+        var result = deleteEntitiesSql(entityClass, entities, tableName);
+        String sql = result.getKey();
+        List<Object> values = result.getValue();
+        System.out.println(sql);
+
+        try (var stmt = connection.prepareStatement(sql)) {
+            for (int i = 0; i < values.size(); i++)
+                stmt.setObject(i + 1, values.get(i));
+            stmt.executeUpdate();
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return entities;
     }
 
     public static <T extends DBEntity> Map.Entry<String, List<Object>> createEntitySql(Class<T> entityClass, T entity, String tableName) {
@@ -239,6 +270,21 @@ public class PostgreDatabase extends Database{
 
         // Append the ID as the final parameter
         for (int i = 0; i < entities.size(); i++) values.get(i).add(entities.get(i).getId());
+
+        return new AbstractMap.SimpleEntry<>(sql.toString(), values);
+    }
+
+    public static <T extends DBEntity> Map.Entry<String, List<Object>> deleteEntitiesSql(Class<T> entityClass, List<T> entities, String tableName) {
+        // Build the base UPDATE statement
+        StringBuilder sql = new StringBuilder("DELETE FROM ")
+                .append(tableName)
+                .append("\nWHERE id IN (");
+        List<Object> values = new ArrayList<>();
+
+        sql.append("?,".repeat(entities.size()));
+        sql.deleteCharAt(sql.length() - 1).append(")");
+
+        for (T entity : entities) values.add(entity.getId());
 
         return new AbstractMap.SimpleEntry<>(sql.toString(), values);
     }

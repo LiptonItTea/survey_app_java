@@ -33,6 +33,7 @@ public class JDBCMain {
 //        }
 
 //        User u = new User(0, "java user", "java_user@mail.ru", null, "moew");
-        System.out.println(Vars.userRepository.updateEntities(user -> user.getId() < 20, user -> user.setEmail("less20@mail.ru")));
+
+        System.out.println(Vars.userRepository.deleteEntities(user -> user.getId() < 20));
     }
 }

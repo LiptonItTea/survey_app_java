@@ -19,5 +19,5 @@ public abstract class Database {
 
     protected abstract <T extends DBEntity> T deleteEntityById(Class<T> entityClass, long id);
 
-    protected abstract <T extends DBEntity> List<Long> deleteEntities(Class<T> entityClass, SearchCondition<T> condition);
+    protected abstract <T extends DBEntity> List<T> deleteEntities(Class<T> entityClass, SearchCondition<T> condition);
 }

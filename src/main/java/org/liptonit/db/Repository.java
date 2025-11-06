@@ -40,7 +40,7 @@ public class Repository<T extends DBEntity> {
         return db.deleteEntityById(entityClass, id);
     }
 
-    public List<Long> deleteEntities(SearchCondition<Survey> condition) {
-        return db.deleteEntities(Survey.class, condition);
+    public List<T> deleteEntities(SearchCondition<T> condition) {
+        return db.deleteEntities(entityClass, condition);
     }
 }
