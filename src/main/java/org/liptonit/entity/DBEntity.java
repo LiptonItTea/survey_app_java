@@ -1,5 +1,7 @@
 package org.liptonit.entity;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public abstract class DBEntity {
@@ -9,6 +11,10 @@ public abstract class DBEntity {
 
     public DBEntity(Long id, DBEntity entity) {
         this.id = id;
+    }
+
+    public DBEntity(ResultSet rs) throws SQLException{
+        this.id = rs.getLong("id");
     }
 
     public long getId() {return id;}

@@ -1,5 +1,7 @@
 package org.liptonit.entity;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -23,6 +25,15 @@ public class User extends DBEntity{
         this.email = entity.getEmail();
         this.registrationDate = entity.getRegistrationDate();
         this.hashedPassword = entity.getHashedPassword();
+    }
+
+    public User(ResultSet rs) throws SQLException {
+        super(rs);
+
+        this.nickname = rs.getString("nickname");
+        this.email = rs.getString("email");
+        this.registrationDate = rs.getDate("registration_date").toLocalDate();
+        this.hashedPassword = rs.getString("hashed_password");
     }
 
     public String getNickname() {
