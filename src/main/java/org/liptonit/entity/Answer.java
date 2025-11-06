@@ -1,5 +1,7 @@
 package org.liptonit.entity;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class Answer extends DBEntity{
@@ -16,6 +18,13 @@ public class Answer extends DBEntity{
         super(id, entity);
         this.text = entity.getText();
         this.idQuestion = entity.getIdQuestion();
+    }
+
+    public Answer(ResultSet rs) throws SQLException {
+        super(rs);
+
+        this.text = rs.getString("text");
+        this.idQuestion = rs.getLong("id_question");
     }
 
     public String getText() {

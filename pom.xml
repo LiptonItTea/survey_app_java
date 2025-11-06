@@ -60,7 +60,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.liptonit.JDBCMain</mainClass>
+                            <mainClass>org.liptonit.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

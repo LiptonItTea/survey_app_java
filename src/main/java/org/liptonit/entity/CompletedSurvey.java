@@ -1,5 +1,7 @@
 package org.liptonit.entity;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class CompletedSurvey extends DBEntity{
@@ -13,6 +15,12 @@ public class CompletedSurvey extends DBEntity{
     public CompletedSurvey(Long id, CompletedSurvey entity) {
         super(id, entity);
         this.idUser = entity.getIdUser();
+    }
+
+    public CompletedSurvey(ResultSet rs) throws SQLException {
+        super(rs);
+
+        this.idUser = rs.getLong("id_user");
     }
 
     public long getIdUser() {

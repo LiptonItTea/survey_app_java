@@ -27,8 +27,6 @@ public class PostgreDatabase extends Database{
         String sql = result.getKey();
         List<Object> values = result.getValue();
 
-        System.out.println(sql);
-
         String readSql;
         try (var stmt = connection.prepareStatement(sql, new String[]{"id"})) {
             for (int i = 0; i < values.size(); i++)
@@ -176,7 +174,6 @@ public class PostgreDatabase extends Database{
         var result = deleteEntitiesSql(entityClass, entities, tableName);
         String sql = result.getKey();
         List<Object> values = result.getValue();
-        System.out.println(sql);
 
         try (var stmt = connection.prepareStatement(sql)) {
             for (int i = 0; i < values.size(); i++)

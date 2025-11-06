@@ -21,5 +21,7 @@ public class Main {
         );
 
         Menu.run();
+
+        SurveyAppService.deleteUser("amogus", "amoguspassword");
     }   
 }

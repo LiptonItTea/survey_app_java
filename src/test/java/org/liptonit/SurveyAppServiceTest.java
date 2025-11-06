@@ -20,6 +20,9 @@ public class SurveyAppServiceTest {
         // Act
         User user = SurveyAppService.signIn(nickname, password);
 
+        // Clear
+        SurveyAppService.deleteUser(nickname, password);
+
         // Assert
         assertNotNull(user);
         assertEquals(nickname, user.getNickname());
@@ -35,6 +38,9 @@ public class SurveyAppServiceTest {
 
         // Act
         User user = SurveyAppService.signIn(nickname, "wrongpassword");
+
+        // Clear
+        SurveyAppService.deleteUser(nickname, password);
 
         // Assert
         assertNull(user);
@@ -84,6 +90,9 @@ public class SurveyAppServiceTest {
                 assertEquals(answerTexts[i][j], answer.getText());
             }
         }
+
+        // Clear
+        SurveyAppService.deleteUser("testuser_survey", "password");
     }
 
     @Test
@@ -107,6 +116,9 @@ public class SurveyAppServiceTest {
         List<QuestionAnswer> questionAnswers = Vars.questionAnswerRepository.readEntities(qa -> qa.getIdCompletedSurvey() == completedSurvey.getId());
         assertEquals(1, questionAnswers.size());
         assertEquals(answers.getFirst().getId(), questionAnswers.getFirst().getIdAnswer());
+
+        // Clear
+        SurveyAppService.deleteUser("testuser_conduct", "password");
     }
 
     @Test
@@ -134,5 +146,8 @@ public class SurveyAppServiceTest {
 
         assertEquals(1L, (long) answerStats.get(answers.getFirst()));
         assertEquals(0L, (long) answerStats.get(answers.get(1)));
+
+        // Clear
+        SurveyAppService.deleteUser("testuser_stats", "password");
     }
 }
