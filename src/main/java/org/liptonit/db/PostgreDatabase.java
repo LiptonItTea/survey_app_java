@@ -101,14 +101,50 @@ public class PostgreDatabase extends Database{
 
     @Override
     protected <T extends DBEntity> T updateEntityById(Class<T> entityClass, long id, Patcher<T> patcher) throws IllegalArgumentException {
-        // todo maybe SELECT then DELETE then INSERT ?
-        return null;
+        T entity = readEntityById(entityClass, id);
+        String tableName = getTableName(entityClass);
+        patcher.patch(entity);
+
+        List<T> temp = new ArrayList<>(); temp.add(entity);
+        var result = updateEntitiesSql(entityClass, temp, tableName);
+        String sql = result.getKey();
+        List<Object> values = result.getValue().getFirst();
+
+        try (var stmt = connection.prepareStatement(sql)) {
+            for (int i = 0; i < values.size(); i++)
+                stmt.setObject(i + 1, values.get(i));
+            stmt.executeUpdate();
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return entity;
     }
 
     @Override
     protected <T extends DBEntity> List<T> updateEntities(Class<T> entityClass, SearchCondition<T> condition, Patcher<T> patcher) {
-        // todo
-        return List.of();
+        List<T> entities = readEntities(entityClass, condition);
+        for (T e : entities)
+            patcher.patch(e);
+        String tableName = getTableName(entityClass);
+
+        var result = updateEntitiesSql(entityClass, entities, tableName);
+        String sql = result.getKey();
+        List<List<Object>> values = result.getValue();
+
+        for (int j = 0; j < entities.size(); j++) {
+            try (var stmt = connection.prepareStatement(sql)) {
+                for (int i = 0; i < values.get(j).size(); i++)
+                    stmt.setObject(i + 1, values.get(j).get(i));
+                stmt.executeUpdate();
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return entities;
     }
 
     @Override
@@ -169,6 +205,42 @@ public class PostgreDatabase extends Database{
         builder.append(");");
 
         return builder.toString();
+    }
+
+    public static <T extends DBEntity> Map.Entry<String, List<List<Object>>> updateEntitiesSql(Class<T> entityClass, List<T> entities, String tableName) {
+        // Build the base UPDATE statement
+        StringBuilder sql = new StringBuilder("UPDATE ")
+                .append(tableName)
+                .append(" SET ");
+
+        var fields = entityClass.getDeclaredFields();
+        List<List<Object>> values = new ArrayList<>();
+        for (int i = 0; i < entities.size(); i++) values.add(new ArrayList<>());
+
+        for (var f : fields) {
+            if (f.getName().equalsIgnoreCase("id") ||
+                    f.getName().equalsIgnoreCase("registrationDate"))
+                continue; // skip id and immutable fields
+
+            f.setAccessible(true);
+            try {
+                sql.append(Sanitaizer.convertCamelCaseToSnakeRegex(f.getName())).append("=?, ");
+                for (int i = 0; i < entities.size(); i++) values.get(i).add(f.get(entities.get(i)));
+            } catch (IllegalAccessException e) {
+                throw new IllegalArgumentException("Unable to access field: " + f.getName(), e);
+            }
+        }
+
+        // Remove trailing comma and space
+        if (sql.charAt(sql.length() - 2) == ',')
+            sql.setLength(sql.length() - 2);
+
+        sql.append(" WHERE id = ?");
+
+        // Append the ID as the final parameter
+        for (int i = 0; i < entities.size(); i++) values.get(i).add(entities.get(i).getId());
+
+        return new AbstractMap.SimpleEntry<>(sql.toString(), values);
     }
 
     private <T extends DBEntity> String getTableName(Class<T> entityClass) {

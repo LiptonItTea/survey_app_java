@@ -32,7 +32,7 @@ public class JDBCMain {
 //            throw new RuntimeException("Something wrong with db connection.");
 //        }
 
-        User u = new User(0, "java user", "java_user@mail.ru", null, "moew");
-        System.out.println(Arrays.toString(Vars.userRepository.readEntities(user -> user.getId() < 20).toArray()));
+//        User u = new User(0, "java user", "java_user@mail.ru", null, "moew");
+        System.out.println(Vars.userRepository.updateEntities(user -> user.getId() < 20, user -> user.setEmail("less20@mail.ru")));
     }
 }
