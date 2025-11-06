@@ -21,9 +21,7 @@ public class PostgreDatabase extends Database{
 
     @Override
     protected <T extends DBEntity> T createEntity(Class<T> entityClass, T entity) {
-        String tableName = Sanitaizer.convertCamelCaseToSnakeRegex(entityClass.getSimpleName());
-        if (tableName.equalsIgnoreCase("user")) // i'm sorry john
-            tableName = "user_accs";
+        String tableName = getTableName(entityClass);
 
         var result = createEntitySql(entityClass, entity, tableName);
         String sql = result.getKey();
@@ -47,8 +45,8 @@ public class PostgreDatabase extends Database{
         try (var stmt = connection.prepareStatement(readSql)) {
             ResultSet entitySet = stmt.executeQuery();
 
-            entitySet.next();
-            return entityClass.getConstructor(ResultSet.class).newInstance(entitySet);
+            if (entitySet.next())
+                return entityClass.getConstructor(ResultSet.class).newInstance(entitySet);
         }
         catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new IllegalArgumentException("Looks like your entity class is missing constructor, or your constructor is not public, or your class doesn't have constructor(Long, DBEntity). You dumbass.");
@@ -56,18 +54,49 @@ public class PostgreDatabase extends Database{
         catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        return null;
     }
 
     @Override
     protected <T extends DBEntity> T readEntityById(Class<T> entityClass, long id) {
-        // todo classname -> sql
+        String readSql = "SELECT * FROM " + getTableName(entityClass) + "\nWHERE id=?";
+
+        try (var stmt = connection.prepareStatement(readSql, new String[]{"id"})) {
+            stmt.setObject(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next())
+                return entityClass.getConstructor(ResultSet.class).newInstance(rs);
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         return null;
     }
 
     @Override
     protected <T extends DBEntity> List<T> readEntities(Class<T> entityClass, SearchCondition<T> condition) {
-        // todo classname -> sql (SELECT * ), obj -> sql, then filter neccessary objects
-        return List.of();
+        String readSql = "SELECT * FROM " + getTableName(entityClass) + ";";
+
+        List<T> result = new ArrayList<>();
+        try (var stmt = connection.prepareStatement(readSql)) {
+            stmt.setFetchSize(1000);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                T e = entityClass.getConstructor(ResultSet.class).newInstance(rs);
+
+                if (condition.select(e))
+                    result.add(e);
+            }
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
     }
 
     @Override
@@ -127,23 +156,6 @@ public class PostgreDatabase extends Database{
         sql.deleteCharAt(sql.length() - 1).append(")");
 
         return new AbstractMap.SimpleEntry<>(sql.toString(), values);
-
-//        System.out.println(sql);
-//        for (Object o : values) {
-//            System.out.println(o);
-//        }
-
-//        try (var stmt = connection.prepareStatement(sql.toString())) {
-//            for (int i = 0; i < values.size(); i++)
-//                stmt.setObject(i + 1, values.get(i));
-////            stmt.executeUpdate();
-//
-//            return stmt;
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        return null;
     }
 
     private String readByIdsSql(ResultSet generatedKeys, String tableName) throws SQLException {
@@ -157,6 +169,14 @@ public class PostgreDatabase extends Database{
         builder.append(");");
 
         return builder.toString();
+    }
+
+    private <T extends DBEntity> String getTableName(Class<T> entityClass) {
+        String tableName = Sanitaizer.convertCamelCaseToSnakeRegex(entityClass.getSimpleName());
+        if (tableName.equalsIgnoreCase("user")) // i'm sorry john
+            tableName = "user_accs";
+
+        return tableName;
     }
 
 }

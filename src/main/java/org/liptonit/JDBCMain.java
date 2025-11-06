@@ -6,6 +6,7 @@ import org.liptonit.entity.User;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class JDBCMain {
@@ -32,6 +33,6 @@ public class JDBCMain {
 //        }
 
         User u = new User(0, "java user", "java_user@mail.ru", null, "moew");
-        System.out.println(Vars.userRepository.createEntity(u));
+        System.out.println(Arrays.toString(Vars.userRepository.readEntities(user -> user.getId() < 20).toArray()));
     }
 }
