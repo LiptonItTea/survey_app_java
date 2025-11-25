@@ -1,5 +1,7 @@
 package org.liptonit.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -8,6 +10,7 @@ import java.util.Objects;
 public class User extends DBEntity{
     private String nickname;
     private String email;
+    @JsonProperty("registration_date")
     private LocalDate registrationDate;
     private String hashedPassword;
 

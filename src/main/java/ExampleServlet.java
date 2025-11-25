@@ -7,6 +7,8 @@ import java.io.IOException;
 
 @WebServlet
 public class ExampleServlet extends HttpServlet {
+
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.getWriter().write("Hey ashimiyau shimiyau shimiyau skrr shalala");
     }

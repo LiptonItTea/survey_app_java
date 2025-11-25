@@ -16,6 +16,7 @@ public class JDBC {
     public static Connection getConnection() {
         try {
 //            Class.forName ("org.h2.Driver");
+            Class.forName("org.postgresql.Driver");
             if (connection == null)
                 connection = DriverManager.getConnection(url, user, password);
         }
