@@ -9,20 +9,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.liptonit.SurveyAppService;
 import org.liptonit.Vars;
+import org.liptonit.entity.Survey;
 import org.liptonit.entity.User;
 
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet
-public class UserServlet extends HttpServlet {
-
+public class SurveyServlet extends HttpServlet {
     private final ObjectMapper mapper;
 
-    public UserServlet() {
+    public SurveyServlet() {
         this.mapper = new ObjectMapper();
-        this.mapper.registerModule(new JavaTimeModule());
-        this.mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Override
@@ -30,9 +28,9 @@ public class UserServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        List<User> users = Vars.userRepository.readEntities(u -> true);
+        List<Survey> surveys = Vars.surveyRepository.readEntities(s -> true);
 
-        mapper.writeValue(resp.getOutputStream(), users);
+        mapper.writeValue(resp.getOutputStream(), surveys);
     }
 
     @Override
@@ -40,11 +38,11 @@ public class UserServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        User user = mapper.readValue(req.getInputStream(), User.class);
+        Survey survey = mapper.readValue(req.getInputStream(), Survey.class);
 
-        User u = SurveyAppService.signUp(user.getNickname(), user.getEmail(), user.getHashedPassword());
+        Survey s = Vars.surveyRepository.createEntity(survey);
 
-        mapper.writeValue(resp.getOutputStream(), u);
+        mapper.writeValue(resp.getOutputStream(), s);
     }
 
     @Override
@@ -52,13 +50,13 @@ public class UserServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        String pathInfo = req.getPathInfo(); // api/users/{userId} => pathInfo={userId}
+        String pathInfo = req.getPathInfo(); // api/users/{surveyId} => pathInfo={surveyId}
         String id = pathInfo.substring(1);
-        Long userId = Long.parseLong(id);
+        Long surveyId = Long.parseLong(id);
 
-        User u = Vars.userRepository.deleteEntityById(userId);
+        Survey s = Vars.surveyRepository.deleteEntityById(surveyId);
 
-        mapper.writeValue(resp.getOutputStream(), u);
+        mapper.writeValue(resp.getOutputStream(), s);
     }
 
     @Override
@@ -66,19 +64,18 @@ public class UserServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        String pathInfo = req.getPathInfo(); // api/users/{userId} => pathInfo={userId}
+        String pathInfo = req.getPathInfo(); // api/users/{surveyId} => pathInfo={surveyId}
         String id = pathInfo.substring(1);
-        Long userId = Long.parseLong(id);
+        Long surveyId = Long.parseLong(id);
 
-        User user = mapper.readValue(req.getInputStream(), User.class);
+        Survey survey = mapper.readValue(req.getInputStream(), Survey.class);
 
-        Vars.userRepository.updateEntityById(userId, u -> {
-            u.setNickname(user.getNickname());
-            u.setEmail(user.getEmail());
-            if (user.getHashedPassword() != null)
-                u.setHashedPassword(user.getHashedPassword());
+        Vars.surveyRepository.updateEntityById(surveyId, s -> {
+            s.setName(survey.getName());
+            s.setDescription(survey.getDescription());
+            s.setIdUserCreator(survey.getIdUserCreator());
         });
 
-        mapper.writeValue(resp.getOutputStream(), Vars.userRepository.readEntityById(userId));
+        mapper.writeValue(resp.getOutputStream(), Vars.surveyRepository.readEntityById(surveyId));
     }
 }

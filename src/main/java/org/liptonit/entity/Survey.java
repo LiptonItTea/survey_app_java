@@ -1,5 +1,7 @@
 package org.liptonit.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -7,6 +9,7 @@ import java.util.Objects;
 public class Survey extends DBEntity{
     private String name;
     private String description;
+    @JsonProperty("id_user_creator")
     private long idUserCreator;
 
     public Survey(long id, String name, String description, long idUserCreator) {

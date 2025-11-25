@@ -12,6 +12,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>SurveyServlet</servlet-name>
+        <servlet-class>org.liptonit.web.SurveyServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>SurveyViewServlet</servlet-name>
         <servlet-class>org.liptonit.web.SurveyViewServlet</servlet-class>
     </servlet>
@@ -24,6 +29,11 @@
     <servlet-mapping>
         <servlet-name>UserViewServlet</servlet-name>
         <url-pattern>/users</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SurveyServlet</servlet-name>
+        <url-pattern>/api/surveys/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

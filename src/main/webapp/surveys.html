@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Surveys — Admin</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+        :root{
+            --gap:12px;
+            --input-height:40px;
+            --textarea-height:88px;
+            --radius:6px;
+            --primary:#1976d2;
+            --danger:#d32f2f;
+            --muted:#555;
+        }
+
+        *{box-sizing:border-box}
+
+        body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;margin:24px}
+        table{width:100%;border-collapse:collapse;margin-top:12px}
+        th,td{padding:8px;border:1px solid #ddd;text-align:left;vertical-align:top}
+        form{display:flex;gap:var(--gap);flex-wrap:wrap;align-items:flex-start}
+        /* Create form layout: grid so fields align nicely */
+        .create-grid{
+            display:grid;
+            gap:var(--gap);
+            width:100%;
+            grid-template-columns: 1fr 1fr 200px; /* name | description | creator */
+            align-items:start;
+        }
+        /* On small screens collapse to a single column */
+        @media (max-width:780px){
+            .create-grid{ grid-template-columns: 1fr; }
+        }
+
+        label{display:flex;flex-direction:column;gap:6px;font-size:0.95rem}
+        input[type="text"], input[type="number"], textarea, input[type="search"]{
+            padding:8px;border:1px solid #ccc;border-radius:var(--radius);
+            font-size:0.95rem;
+        }
+        input[type="text"], input[type="number"]{
+            height:var(--input-height);
+        }
+        textarea{
+            height:var(--textarea-height);
+            resize:vertical;
+            padding-top:8px;
+            padding-bottom:8px;
+        }
+
+        button{padding:8px 12px;border-radius:var(--radius);border:0;background:var(--primary);color:white;cursor:pointer}
+        .danger{background:var(--danger)}
+        .secondary{background:#888}
+        .small{font-size:0.9rem;color:var(--muted)}
+        .toolbar{display:flex;gap:var(--gap);align-items:center;flex-wrap:wrap;margin-bottom:10px}
+        .message{margin-top:10px;color:green}
+        .error{color:#b00020}
+        .searchBox{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+        .editRow input, .editRow textarea{width:100%}
+        /* table actions */
+        .actions button{margin-right:6px}
+    </style>
+</head>
+<body>
+<h1>Surveys</h1>
+
+<!-- CREATE FORM -->
+<div class="toolbar">
+    <form id="createForm" class="create-grid" autocomplete="off">
+        <label>
+            <span>Name</span>
+            <input type="text" id="name" required placeholder="Survey name" />
+        </label>
+
+        <label style="min-width:0"> <!-- allow flex shrink -->
+            <span>Description</span>
+            <textarea id="description" rows="3" placeholder="Short description (optional)"></textarea>
+        </label>
+
+        <label>
+            <span>Creator ID</span>
+            <input type="number" id="creator" required min="1" />
+        </label>
+
+        <!-- place the submit button in a separate row under the grid on wide screens -->
+        <div style="grid-column: 1 / -1; display:flex; gap:8px; justify-content:flex-end; margin-top:4px;">
+            <button type="submit">Create Survey</button>
+        </div>
+    </form>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="searchBox">
+    <label for="searchInput"><strong>Search:</strong></label>
+    <input type="search" id="searchInput" placeholder="name or description..." style="min-width:220px"/>
+    <button id="searchBtn">Find</button>
+    <button id="resetBtn" type="button">Reset</button>
+</div>
+
+<div id="feedback" class="message" role="status" aria-live="polite"></div>
+
+<table id="surveysTable" aria-describedby="surveysCaption">
+    <caption id="surveysCaption" class="small">List of surveys</caption>
+    <thead>
+    <tr><th style="width:6ch">ID</th><th>Name</th><th>Description</th><th style="width:9ch">Creator</th><th style="width:18ch">Actions</th></tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    const API_BASE = "api";
+    const feedback = document.getElementById('feedback');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function showMessage(msg, isError=false){
+        feedback.textContent = msg;
+        feedback.className = isError ? 'error' : 'message';
+        setTimeout(()=>{ feedback.textContent = ''; }, 4000);
+    }
+
+    function escapeHtml(s){ return String(s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    async function fetchSurveys(query=""){
+        try {
+            let url = `${API_BASE}/surveys/`;
+            const res = await fetch(url);
+            if(!res.ok) throw new Error(`Failed to load (${res.status})`);
+            let surveys = await res.json();
+
+            if (query) {
+                const q = query.toLowerCase();
+                surveys = surveys.filter(s =>
+                    (s.name ?? '').toLowerCase().includes(q) ||
+                    (s.description ?? '').toLowerCase().includes(q)
+                );
+            }
+
+            const tbody = document.querySelector('#surveysTable tbody');
+            tbody.innerHTML = '';
+            surveys.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+        <td>${s.id ?? ''}</td>
+        <td>${escapeHtml(s.name)}</td>
+        <td>${escapeHtml(s.description)}</td>
+        <td>${s.id_user_creator ?? ''}</td>
+        <td>
+          <button data-id="${s.id}" class="editBtn">Edit</button>
+          <button data-id="${s.id}" class="deleteBtn danger">Delete</button>
+        </td>`;
+                tbody.appendChild(tr);
+            });
+        } catch (err) {
+            showMessage(err.message, true);
+        }
+    }
+
+    // CREATE SURVEY
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const id_user_creator = parseInt(document.getElementById('creator').value);
+
+        try {
+            const res = await fetch(`${API_BASE}/surveys/`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name, description, id_user_creator })
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(()=>null);
+                throw new Error(err?.detail || `Create failed (${res.status})`);
+            }
+            const created = await res.json();
+            showMessage(`Created survey "${created.name}" (id=${created.id})`);
+            e.target.reset();
+            await fetchSurveys();
+        } catch (err) {
+            showMessage(err.message, true);
+        }
+    });
+
+    // DELETE SURVEY
+    document.querySelector('#surveysTable').addEventListener('click', async (ev) => {
+        const btn = ev.target.closest('button.deleteBtn');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        if (!confirm(`Delete survey #${id}?`)) return;
+        try {
+            const res = await fetch(`${API_BASE}/surveys/${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error(`Delete failed (${res.status})`);
+            showMessage(`Deleted survey #${id}`);
+            await fetchSurveys(searchInput.value);
+        } catch (err) {
+            showMessage(err.message, true);
+        }
+    });
+
+    // EDIT SURVEY
+    document.querySelector('#surveysTable').addEventListener('click', async (ev) => {
+        const btn = ev.target.closest('button.editBtn');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const tr = btn.closest('tr');
+        if (tr.classList.contains('editRow')) return; // already editing
+
+        const [idCell, nameCell, descCell, creatorCell, actionCell] = tr.children;
+        const name = nameCell.textContent.trim();
+        const description = descCell.textContent.trim();
+
+        tr.classList.add('editRow');
+        nameCell.innerHTML = `<input type="text" value="${escapeHtml(name)}" />`;
+        descCell.innerHTML = `<textarea rows="2">${escapeHtml(description)}</textarea>`;
+        actionCell.innerHTML = `
+    <button class="saveBtn" data-id="${id}">Save</button>
+    <button class="cancelBtn secondary">Cancel</button>`;
+
+        actionCell.querySelector('.saveBtn').addEventListener('click', async () => {
+            const newName = nameCell.querySelector('input').value.trim();
+            const newDesc = descCell.querySelector('textarea').value.trim();
+            try {
+                const res = await fetch(`${API_BASE}/surveys/${id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name: newName, description: newDesc })
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(()=>null);
+                    throw new Error(err?.detail || `Update failed (${res.status})`);
+                }
+                showMessage(`Updated survey #${id}`);
+                await fetchSurveys(searchInput.value);
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        });
+
+        actionCell.querySelector('.cancelBtn').addEventListener('click', () => {
+            fetchSurveys(searchInput.value);
+        });
+    });
+
+    // SEARCH HANDLERS
+    searchBtn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        fetchSurveys(searchInput.value.trim());
+    });
+    resetBtn.addEventListener('click', ()=>{
+        searchInput.value = '';
+        fetchSurveys();
+    });
+
+    fetchSurveys();
+</script>
+</body>
+</html>
