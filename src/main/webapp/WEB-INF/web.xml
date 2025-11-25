@@ -6,9 +6,29 @@
         <servlet-class>org.liptonit.web.UserServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>UserViewServlet</servlet-name>
+        <servlet-class>org.liptonit.web.UserViewServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>SurveyViewServlet</servlet-name>
+        <servlet-class>org.liptonit.web.SurveyViewServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>UserServlet</servlet-name>
         <url-pattern>/api/users/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>UserViewServlet</servlet-name>
+        <url-pattern>/users</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SurveyViewServlet</servlet-name>
+        <url-pattern>/surveys</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list> <welcome-file>index.jsp</welcome-file> </welcome-file-list>
