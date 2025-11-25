@@ -12,7 +12,10 @@ public class User extends DBEntity{
     private String email;
     @JsonProperty("registration_date")
     private LocalDate registrationDate;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String hashedPassword;
+
+    public User() {}
 
     public User(long id, String nickname, String email, LocalDate registrationDate, String hashedPassword) {
         super(id);

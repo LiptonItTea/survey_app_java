@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.liptonit.SurveyAppService;
 import org.liptonit.Vars;
 import org.liptonit.entity.User;
 
@@ -34,4 +35,41 @@ public class UserServlet extends HttpServlet {
         mapper.writeValue(resp.getOutputStream(), users);
     }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        User user = mapper.readValue(req.getInputStream(), User.class);
+
+        User u = SurveyAppService.signUp(user.getNickname(), user.getEmail(), user.getHashedPassword());
+
+        mapper.writeValue(resp.getOutputStream(), u);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String pathInfo = req.getPathInfo(); // api/users/{userId} => pathInfo={userId}
+        String id = pathInfo.substring(1);
+        Long userId = Long.parseLong(id);
+
+        User u = Vars.userRepository.deleteEntityById(userId);
+
+        mapper.writeValue(resp.getOutputStream(), u);
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String pathInfo = req.getPathInfo(); // api/users/{userId} => pathInfo={userId}
+        String id = pathInfo.substring(1);
+        Long userId = Long.parseLong(id);
+
+        User user = mapper.readValue(req.getInputStream(), User.class);
+
+        Vars.userRepository.updateEntityById(userId, u -> {
+            u.setNickname(user.getNickname());
+            u.setEmail(user.getEmail());
+            if (user.getHashedPassword() != null)
+                u.setHashedPassword(user.getHashedPassword());
+        });
+
+        mapper.writeValue(resp.getOutputStream(), Vars.userRepository.readEntityById(userId));
+    }
 }

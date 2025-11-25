@@ -5,7 +5,9 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public abstract class DBEntity {
-    private final long id;
+    private long id;
+
+    public DBEntity() {}
 
     public DBEntity(long id) {this.id = id;}
 
